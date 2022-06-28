@@ -4,5 +4,5 @@
 
 
 FROM rust:1.59-slim
-COPY ./target/debug/second-app ./second-app
-CMD ./second-app
+COPY ./target/debug/second-app ./run-service
+CMD ./run-service
