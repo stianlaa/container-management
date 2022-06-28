@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  first-app:
+    image: first-app
+    container_name: first-app-container
+
+  second-app:
+    image: second-app
+    container_name: second-app-container
