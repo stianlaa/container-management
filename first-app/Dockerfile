@@ -5,4 +5,4 @@
 
 FROM rust:1.59-slim
 COPY ./target/debug/first-app ./run-service
-CMD ./run-service
+ENTRYPOINT ["./run-service", "default-param-1", "default-param-2"]
