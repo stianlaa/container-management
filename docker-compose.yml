@@ -4,7 +4,23 @@ services:
   first-app:
     image: first-app
     container_name: first-app-container
-    entrypoint: ["./run-service", "compose-entrypoint-param-1", "compose-entrypoint-param-2"]
+## Entrypoint alternative 1:
+#    entrypoint:
+#      - ./run-service
+#      - test1
+#      - test2
+#      - test3
+#      - test4
+
+## Entrypoint alternative 2:
+#    entrypoint: ["./run-service", "compose-entrypoint-param-1", "compose-entrypoint-param-2"]
+
+## Entrypoint alternative 3:
+    entrypoint: ["./run-service",
+      "test1", "test2",
+      "test3", "test4"
+    ]
+
 
 #  second-app:
 #    image: second-app

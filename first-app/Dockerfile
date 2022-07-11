@@ -5,4 +5,7 @@
 
 FROM rust:1.59-slim
 COPY ./target/debug/first-app ./run-service
-ENTRYPOINT ["./run-service", "default-param-1", "default-param-2"]
+ENTRYPOINT ["./run-service", \
+"name-1", "default-value-2", \
+"name-2", "default-value-4" \
+]

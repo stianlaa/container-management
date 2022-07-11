@@ -21,4 +21,6 @@ Run all images: docker compose up
 
 - feeding docker images with arguments, updating arguments
 https://docs.docker.com/engine/reference/builder/
-> The main purpose of a CMD is to provide defaults for an executing container. These defaults can include an executable, or they can omit the executable, in which case you must specify an ENTRYPOINT instruction as well.
+ The main purpose of a CMD is to provide defaults for an executing container. These defaults can include an executable, or they can omit the executable, in which case you must specify an ENTRYPOINT instruction as well.
+
+excellent details on iteraction between CMD and ENTRYPOINT: https://docs.docker.com/engine/reference/builder/#understand-how-cmd-and-entrypoint-interact
