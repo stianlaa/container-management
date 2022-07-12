@@ -42,6 +42,15 @@ excellent details on iteraction between CMD and ENTRYPOINT: https://docs.docker.
     docker push username/registryname:tagname
 ```
 
+### Pulling a specific tag from docker registry:
+``` 
+docker pull stianlaa/dev-docker-repo:first-tag
+```
+So to specify a specific app image, and allow for updates, a decent convention might be `{appname-1.2.3}`, or `{appname__1.2.3}`, see conventions: https://docs.docker.com/engine/reference/commandline/tag/
+
+### Authentication
+It might be an alternative to do docker login upon setup. Docker login creates or updates the ~/.docker/config.json file for you. With just the login part, it look likes
+
 ## Remaining Aspects to investigate:
 
 - providing images with dependencies

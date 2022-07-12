@@ -1,8 +1,8 @@
-version: '3.9'
+version: "3.9"
 
 services:
   first-app:
-    image: first-app
+    image: stianlaa/dev-docker-repo:first-tag
     container_name: first-app-container
 ## Entrypoint alternative 1:
 #    entrypoint:
@@ -23,5 +23,5 @@ services:
 
 
 #  second-app:
-#    image: second-app
+#    image: stianlaa/dev-docker-repo:second-tag
 #    container_name: second-app-container
