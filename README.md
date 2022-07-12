@@ -27,11 +27,19 @@ excellent details on iteraction between CMD and ENTRYPOINT: https://docs.docker.
   - Alternative 3: A local script which can be run to build and update image
   - Alternative 4: An integration with clions docker plugin?
 
-### Pushing to private docker registry manually
-``
+### Pushing a local repository to docker registry manually
+```
     docker login --username username
     docker tag my-image username/my-repo
     docker push username/my-repo
+```
+
+### Pushing a specific image to docker registry manually
+```
+    docker build -t appname -f dockerfilepath/Dockerfile .
+    docker login --username username
+    docker tag appname username/registryname:tagname
+    docker push username/registryname:tagname
 ```
 
 ## Remaining Aspects to investigate:
