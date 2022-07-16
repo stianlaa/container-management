@@ -1,0 +1,23 @@
+name: build-and-publish-docker-images
+
+on:
+  push:
+    tags: ['*']
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: cargo build
+        run: cargo build --verbose
+      - name: cargo test
+        run: cargo test --verbose
+      - name: docker compose build
+        run: docker compose build
+      - name: docker compose push
+        run: docker compose push
