@@ -2,26 +2,24 @@ version: "3.9"
 
 services:
   first-app:
-    image: stianlaa/dev-docker-repo:first-tag
     container_name: first-app-container
-## Entrypoint alternative 1:
-#    entrypoint:
-#      - ./run-service
-#      - test1
-#      - test2
-#      - test3
-#      - test4
-
-## Entrypoint alternative 2:
-#    entrypoint: ["./run-service", "compose-entrypoint-param-1", "compose-entrypoint-param-2"]
-
-## Entrypoint alternative 3:
+    image: stianlaa/dev-docker-repo:first-tag
+    build:
+      context: .
+      dockerfile: ./first-app/Dockerfile
     entrypoint: ["./run-service",
-      "test1", "test2",
-      "test3", "test4"
+      "test1", "value1",
+      "test2", "value2"
     ]
 
+  second-app:
+    container_name: second-app-container
+    image: stianlaa/dev-docker-repo:second-tag
+    build:
+      context: .
+      dockerfile: ./second-app/Dockerfile
 
-#  second-app:
-#    image: stianlaa/dev-docker-repo:second-tag
-#    container_name: second-app-container
+    entrypoint: ["./run-service",
+      "test3", "value3",
+      "test4", "value4"
+    ]

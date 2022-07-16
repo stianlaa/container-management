@@ -4,8 +4,8 @@
 
 
 FROM rust:1.59-slim
-COPY ./target/debug/first-app ./run-service
+COPY ../target/debug/first-app ./run-service
 ENTRYPOINT ["./run-service", \
-"name-1", "default-value-2", \
-"name-2", "default-value-4" \
+"test3", "default-value-3", \
+"test4", "default-value-4" \
 ]
