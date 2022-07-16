@@ -21,7 +21,7 @@ services:
       dockerfile: ./second-app/Dockerfile
     # Example of how start dependency can be added
     depends_on:
-      - second-app
+      - first-app
     entrypoint: ["./run-service",
       "test3", "value3",
       "test4", "value4"
