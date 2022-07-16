@@ -58,6 +58,5 @@ Regarding image size etc., docker is excellent at layered pulls, that means it w
 It might be an alternative to do docker login upon setup. Docker login creates or updates the ~/.docker/config.json file for you.
 
 ## Remaining Aspects to investigate:
-
-- providing images with dependencies, e.g. a start-up order or similar
+- building and pushing images from ci
 - api to manage services (e.g. for management from web)

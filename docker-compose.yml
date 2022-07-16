@@ -7,6 +7,7 @@ services:
     build:
       context: .
       dockerfile: ./first-app/Dockerfile
+    # Container parameters can be defined here
     entrypoint: ["./run-service",
       "test1", "value1",
       "test2", "value2"
@@ -18,7 +19,9 @@ services:
     build:
       context: .
       dockerfile: ./second-app/Dockerfile
-
+    # Example of how start dependency can be added
+    depends_on:
+      - second-app
     entrypoint: ["./run-service",
       "test3", "value3",
       "test4", "value4"
