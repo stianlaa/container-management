@@ -46,7 +46,7 @@ Given alternative 2, using tagged branch:
     docker push username/registryname:tagname
 ```
 
-### Pulling a specific tag from docker registry:
+### Pulling a specific tag from docker registry
 ``` 
 docker pull stianlaa/dev-docker-repo:first-tag
 ```
@@ -57,6 +57,12 @@ Regarding image size etc., docker is excellent at layered pulls, that means it w
 ### Authentication
 It might be an alternative to do docker login upon setup. Docker login creates or updates the ~/.docker/config.json file for you.
 
-## Remaining Aspects to investigate:
+## Remaining Aspects to investigate
 - building and pushing images from ci
+```
+git tag -a image_v0.0.1 -m "example tag to trigger build"
+git push --tags
+```
+
+## Management api
 - api to manage services (e.g. for management from web)
