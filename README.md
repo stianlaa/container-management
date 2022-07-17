@@ -17,7 +17,7 @@ Run all images: `docker compose up`
 So to tag and create images from ci, use:
 ```
     git tag -a image_v0.0.1 -m "example tag to trigger build"
-    git push --tags
+    git push origin <tag_name>
 ```
 Regarding image size etc., docker is excellent at layered pulls, that means it will reuse most of the parts of the images pulled. So at the initial pull alpine is around 700MB for one image, after that it's much smaller.
 
