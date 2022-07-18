@@ -2,6 +2,6 @@
 
 members = [
     "manager",
-    "arg-test",
+    "arg-poc",
     "second-app",
 ]

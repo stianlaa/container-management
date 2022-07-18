@@ -1,12 +1,12 @@
 version: "3.9"
 
 services:
-  arg-test:
-    container_name: arg-test-container
+  arg-poc:
+    container_name: arg-poc-container
     image: stianlaa/dev-docker-repo:first-tag
     build:
       context: .
-      dockerfile: arg-test/Dockerfile
+      dockerfile: arg-poc/Dockerfile
     # Container parameters can be defined here
     entrypoint: ["./run-service",
       "test1", "value1",
@@ -21,7 +21,7 @@ services:
       dockerfile: ./second-app/Dockerfile
     # Example of how start dependency can be added
     depends_on:
-      - arg-test
+      - arg-poc
     entrypoint: ["./run-service",
       "test3", "value3",
       "test4", "value4"

@@ -6,14 +6,12 @@ See: https://docs.docker.com/engine/install/ubuntu/
 
 ## Basic use:
 
-Build image: `docker compose build arg-test`
-Run specific image: `docker compose up arg-test`
+Build image: `docker compose build arg-poc`
+Run specific image: `docker compose up arg-poc`
 Run all images: `docker compose up`
 
 ### Integration with github actions
 - if branch is tagged to match regex: `image_v[0-9]+.[0-9]+.[0-9]+`, start deploy image pipeline, regarding tag naming, see conventions: https://docs.docker.com/engine/reference/commandline/tag/
-- look for docker-compose.<systemname> file, matching to tag. Version is placed in dockerfile as label:version:
-
 So to tag and create images from ci, use:
 ```
     git tag -a image_v0.0.1 -m "example tag to trigger build"
