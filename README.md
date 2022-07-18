@@ -6,8 +6,8 @@ See: https://docs.docker.com/engine/install/ubuntu/
 
 ## Basic use:
 
-Build image: `docker compose build first-app`
-Run specific image: `docker compose up first-app`
+Build image: `docker compose build arg-test`
+Run specific image: `docker compose up arg-test`
 Run all images: `docker compose up`
 
 ### Integration with github actions
@@ -45,9 +45,34 @@ Regarding image size etc., docker is excellent at layered pulls, that means it w
 ### Authentication
 There might be an alternative to do docker login upon setup. Docker login creates or updates the ~/.docker/config.json file for you.
 
-## Management api
+### Management api
 - api to manage services (e.g. for management from web)
 - maybe there are node modules which provide the integration out-of-the-box
 Node packages to interact with docker:
 - https://www.npmjs.com/package/dockerode
 - https://www.npmjs.com/package/node-docker-api
+
+### Removing unknown containers, (permission issue)
+Removing unknown containers
+```
+sudo aa-remove-unknown
+docker container kill $(docker ps -q)
+```
+
+### Stopping running rust apps
+```
+Rust doesn't automatically handle sigterm signal, docker by default emits sigkill which works after 10 seconds
+To emit sigkill with a shorter delay, --time option can be used
+docker stop <container> --time=1
+```
+
+### Remaining to explore:
+- make example app with network use
+- make example app with device use
+- make example app which uses camera
+- make example app with volume use
+- make example app which panics every X seconds (test failed container)
+- make example app testing logging capability
+- make example apps which interact over network
+- implementing an equivalent services view, adjust api integration to use one of the modems above
+- evalute docker sdk, and potential `nucli` integration
