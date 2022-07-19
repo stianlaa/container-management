@@ -66,6 +66,7 @@ docker stop <container> --time=1
 
 ### Remaining to explore:
 - make example app with network use
+- docker compose images are hardcoded
 - make example app with device use
 - make example app which uses camera
 - make example app with volume use

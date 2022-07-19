@@ -3,5 +3,5 @@
 members = [
     "manager",
     "arg-poc",
-    "second-app",
+    "rocket-poc",
 ]
