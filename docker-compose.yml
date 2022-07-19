@@ -13,8 +13,8 @@ services:
       "test2", "value2"
     ]
 
-  rocket poc:
-    container_name: rocket poc-container
+  rocket-poc:
+    container_name: rocket-poc-container
     image: stianlaa/dev-docker-repo:second-tag
     build:
       context: .
@@ -26,3 +26,5 @@ services:
       "test3", "value3",
       "test4", "value4"
     ]
+    ports:
+      - "8000:8000"
