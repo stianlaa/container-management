@@ -4,4 +4,5 @@ members = [
     "manager",
     "arg-poc",
     "rocket-poc",
+    "camera-poc",
 ]
