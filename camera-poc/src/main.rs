@@ -11,8 +11,20 @@ fn main() {
 
     // open stream
     camera.open_stream().unwrap();
-    loop {
-        let frame = camera.frame().unwrap();
-        println!("{}, {}", frame.width(), frame.height());
-    }
+
+    let frame = camera.frame().unwrap();
+    println!(
+        "camera frame has width: {}, height: {}",
+        frame.width(),
+        frame.height()
+    );
+
+    image::save_buffer(
+        "image.jpeg",
+        frame.as_ref(),
+        frame.width(),
+        frame.height(),
+        image::ColorType::Rgb8,
+    )
+    .unwrap()
 }
