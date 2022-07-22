@@ -8,9 +8,9 @@ services:
       context: .
       dockerfile: arg-poc/Dockerfile
     # Container parameters can be defined here
-    entrypoint: ["./run-service",
-      "test1", "value1",
-      "test2", "value2"
+    entrypoint: [ "./run-service",
+                  "test1", "value1",
+                  "test2", "value2"
     ]
 
   rocket-poc:
@@ -22,9 +22,15 @@ services:
     # Example of how start dependency can be added
     depends_on:
       - arg-poc
-    entrypoint: ["./run-service",
-      "test3", "value3",
-      "test4", "value4"
-    ]
+    entrypoint: [ "./run-service" ]
     ports:
       - "8000:8000"
+
+  volume-poc:
+    container_name: volume-poc-container
+    image: stianlaa/dev-docker-repo:third-tag
+    build:
+      context: .
+      dockerfile: volume-poc/Dockerfile
+    # Container parameters can be defined here
+    entrypoint: [ "./run-service" ]
