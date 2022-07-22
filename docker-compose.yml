@@ -13,12 +13,12 @@ services:
                   "test2", "value2"
     ]
 
-  rocket-poc:
-    container_name: rocket-poc-container
+  network-poc:
+    container_name: network-poc-container
     image: stianlaa/dev-docker-repo:second-tag
     build:
       context: .
-      dockerfile: rocket-poc/Dockerfile
+      dockerfile: network-poc/Dockerfile
     # Example of how start dependency can be added
     depends_on:
       - arg-poc
