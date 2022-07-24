@@ -5,4 +5,5 @@ members = [
     "arg-poc",
     "network-poc",
     "volume-poc",
+    "panic-poc",
 ]

@@ -7,7 +7,7 @@ services:
     build:
       context: .
       dockerfile: arg-poc/Dockerfile
-    # Container parameters can be defined here
+    # Example of how container parameters can be defined here
     entrypoint: [ "./run-service",
                   "test1", "value1",
                   "test2", "value2"
@@ -32,5 +32,15 @@ services:
     build:
       context: .
       dockerfile: volume-poc/Dockerfile
-    # Container parameters can be defined here
     entrypoint: [ "./run-service" ]
+
+  panic-poc:
+    container_name: panic-poc-container
+    image: stianlaa/dev-docker-repo:fourth-tag
+    build:
+      context: .
+      dockerfile: panic-poc/Dockerfile
+    entrypoint: [ "./run-service" ]
+    # Various restart configurations available
+    restart: on-failure
+    # restart: no

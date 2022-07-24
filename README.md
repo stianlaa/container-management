@@ -67,9 +67,6 @@ docker stop <container> --time=1
 ### Remaining to explore:
 - make example app which uses camera
 - make example app with device use
-- make example app with volume use
-- make example app which panics every X seconds (test failed container)
 - make example app testing logging capability
 - make example apps which interact over network
-- implementing an equivalent services view, adjust api integration to use one of the modems above
 - evaluate docker sdk, and potential `nucli` integration for container control
