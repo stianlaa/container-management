@@ -1,12 +1,14 @@
 extern crate dockworker;
 
-use crate::container::{list_containers, ResponseWrapper};
+use crate::container::list_containers;
+use crate::web_result::WebResult;
 use dockworker::container::Container;
 
 mod container;
+mod web_result;
 
 #[rocket::get("/list", format = "json")]
-fn list() -> ResponseWrapper<Vec<Container>> {
+fn list() -> WebResult<Vec<Container>> {
     list_containers()
 }
 
