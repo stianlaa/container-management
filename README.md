@@ -64,9 +64,12 @@ To emit sigkill with a shorter delay, --time option can be used
 docker stop <container> --time=1
 ```
 
+### Regarding manager implementation
+It seems that docker daemon communications ideally over socket, and a webserver should exist to map and forward http requests, much the same way a systemd setup might have to.
+It is possible to expose the docker daemon, but not recommended, and this would entail extra work in frontend: https://towardsaws.com/ec2-2-ways-to-expose-docker-daemon-to-the-internet-why-61e349f99744
+
 ### Remaining to explore:
 - make example app which uses camera
 - make example app with device use
 - make example app testing logging capability
 - make example apps which interact over network
-- evaluate docker sdk, and potential `nucli` integration for container control

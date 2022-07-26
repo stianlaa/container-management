@@ -1,7 +1,7 @@
 [workspace]
 
 members = [
-    "manager",
+    "manager-api",
     "arg-poc",
     "network-poc",
     "volume-poc",

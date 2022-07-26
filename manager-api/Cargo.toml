@@ -1,0 +1,8 @@
+[package]
+name = "manager-api"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rocket = "0.5.0-rc.2"
+dockworker = "0.0.23"
