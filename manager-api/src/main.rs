@@ -1,12 +1,13 @@
 extern crate dockworker;
 
-use dockworker::Docker;
+use crate::container::{list_containers, ResponseWrapper};
+use dockworker::container::Container;
 
-#[rocket::get("/list")]
-fn list() -> String {
-    let docker = Docker::connect_with_defaults().unwrap();
-    println!("{:#?}", docker.system_info().unwrap());
-    String::from("placeholder")
+mod container;
+
+#[rocket::get("/list", format = "json")]
+fn list() -> ResponseWrapper<Vec<Container>> {
+    list_containers()
 }
 
 #[rocket::main]
