@@ -1,6 +1,5 @@
 extern crate dockworker;
 
-use crate::container::list_containers;
 use crate::web_result::WebResult;
 use dockworker::container::Container;
 
@@ -9,13 +8,18 @@ mod web_result;
 
 #[rocket::get("/list", format = "json")]
 fn list() -> WebResult<Vec<Container>> {
-    list_containers()
+    container::list()
+}
+
+#[rocket::get("/start?<image>", format = "json")]
+fn start(image: &str) -> WebResult<()> {
+    container::start(image)
 }
 
 #[rocket::main]
 async fn main() {
     let _ = rocket::build()
-        .mount("/", rocket::routes![list])
+        .mount("/", rocket::routes![list, start])
         .launch()
         .await;
 }

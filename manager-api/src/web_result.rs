@@ -13,6 +13,11 @@ pub struct WebError {
     pub error: ErrorContent,
 }
 
+pub enum WebResult<T: Serialize> {
+    Ok(T),
+    Err(WebError),
+}
+
 impl WebError {
     pub fn new(code: u16, description: String) -> WebError {
         let reason = match code {
@@ -40,11 +45,6 @@ impl<'r> rocket::response::Responder<'r, 'static> for WebError {
             .status(rocket::http::Status::new(self.error.code))
             .ok()
     }
-}
-
-pub enum WebResult<T: Serialize> {
-    Ok(T),
-    Err(WebError),
 }
 
 impl<'r, T: Serialize> rocket::response::Responder<'r, 'static> for WebResult<T> {
