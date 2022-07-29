@@ -1,14 +1,46 @@
 extern crate dockworker;
 
-use crate::container::{StartArgs, StopArgs};
+use crate::container::{Container, StartArgs, StopArgs};
 use crate::web_result::WebResult;
-use dockworker::container::Container;
 use dockworker::image::SummaryImage;
+use rocket::fairing::{Fairing, Info, Kind};
+use rocket::http::{Header, Method, Status};
+use rocket::response::Response;
 use rocket::serde::json::Json;
+use rocket::Request;
 
 mod container;
 mod image;
 mod web_result;
+pub struct CORS;
+
+// From: https://github.com/SergioBenitez/Rocket/issues/2142#issuecomment-1086660848
+#[rocket::async_trait]
+impl Fairing for CORS {
+    fn info(&self) -> Info {
+        Info {
+            name: "Add CORS headers to responses",
+            kind: Kind::Response,
+        }
+    }
+
+    async fn on_response<'r>(&self, request: &'r Request<'_>, response: &mut Response<'r>) {
+        if request.method() == Method::Options {
+            response.set_status(Status::NoContent);
+            response.set_header(Header::new(
+                "Access-Control-Allow-Methods",
+                "POST, PATCH, GET, DELETE",
+            ));
+            response.set_header(Header::new(
+                "Access-Control-Allow-Headers",
+                "content-type, authorization",
+            ));
+        }
+        response.set_header(Header::new("Access-Control-Allow-Origin", "*"));
+        response.set_header(Header::new("Access-Control-Allow-Credentials", "true"));
+        response.set_header(Header::new("Vary", "Origin"));
+    }
+}
 
 //container
 #[rocket::get("/list", format = "application/json")]
@@ -40,6 +72,7 @@ async fn main() {
             rocket::routes![list_containers, start_containers, stop_containers],
         )
         .mount("/image/", rocket::routes![list_images])
+        .attach(CORS)
         .launch()
         .await;
 }
