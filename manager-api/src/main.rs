@@ -2,6 +2,7 @@ extern crate dockworker;
 
 use crate::container::{Container, StartArgs, StopArgs};
 use crate::web_result::WebResult;
+use docker_compose_types::Compose;
 use dockworker::image::SummaryImage;
 use rocket::fairing::{Fairing, Info, Kind};
 use rocket::http::{Header, Method, Status};
@@ -9,6 +10,7 @@ use rocket::response::Response;
 use rocket::serde::json::Json;
 use rocket::Request;
 
+mod compose;
 mod container;
 mod image;
 mod web_result;
@@ -44,7 +46,7 @@ impl Fairing for CORS {
 
 //container
 #[rocket::get("/list", format = "application/json")]
-fn list_containers() -> WebResult<Vec<Container>> {
+fn get_container_list() -> WebResult<Vec<Container>> {
     container::list()
 }
 
@@ -60,8 +62,14 @@ fn stop_containers(data: Json<StopArgs>) -> WebResult<()> {
 
 //image
 #[rocket::get("/list", format = "application/json")]
-fn list_images() -> WebResult<Vec<SummaryImage>> {
+fn get_image_list() -> WebResult<Vec<SummaryImage>> {
     image::list()
+}
+
+//compose
+#[rocket::get("/docker-compose", format = "application/json")]
+fn get_docker_compose() -> WebResult<Compose> {
+    compose::get_docker_compose()
 }
 
 #[rocket::main]
@@ -69,9 +77,10 @@ async fn main() {
     let _ = rocket::build()
         .mount(
             "/container/",
-            rocket::routes![list_containers, start_containers, stop_containers],
+            rocket::routes![get_container_list, start_containers, stop_containers],
         )
-        .mount("/image/", rocket::routes![list_images])
+        .mount("/image/", rocket::routes![get_image_list])
+        .mount("/compose/", rocket::routes![get_docker_compose])
         .attach(CORS)
         .launch()
         .await;
