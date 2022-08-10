@@ -4,6 +4,17 @@ const api = axios.create({
     baseURL: "http://localhost:8000",
 });
 
+export async function requestDockerCompose(): Promise<object> {
+    try {
+        const response = await api.get("/compose/docker-compose");
+        return response.data;
+    }
+    catch (error) {
+        console.error(error);
+    }
+    return null;
+}
+
 export async function requestServiceStatus(): Promise<object> {
     try {
         const response = await api.get("/container/list");
