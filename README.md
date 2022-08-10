@@ -73,3 +73,10 @@ It is possible to expose the docker daemon, but not recommended, and this would 
 - make example app with device use
 - make example app testing logging capability
 - make example apps which interact over network
+
+---
+### docker-compose plan: endpoints, naming and structure:
+structure:
+- what is running is containers, and should be named so, to distinguish them from systemd services
+- instead of integrating directly with docker-compose, introduce endpoint for list of containers, this allows for docker changes in the future without adapting frontend
+- similarly, keep mapping layer between docker-api and docker endpoint

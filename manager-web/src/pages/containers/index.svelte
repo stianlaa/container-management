@@ -20,19 +20,6 @@
         }
     }
 
-    let images = {
-        "first-image": {
-            name: "image 1",
-        },
-        "second-image": {
-            name: "image 2",
-        }
-    }
-
-    let selectedImage = Object.values(images).length > 0 ? images[0] : null;
-    let answerImage;
-    let newContainerName = "";
-
     let composeInfo = null;
     composeInfoStore.subscribe(value => {
         if (value !== null) {

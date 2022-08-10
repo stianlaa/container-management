@@ -9,6 +9,7 @@ use rocket::http::{Header, Method, Status};
 use rocket::response::Response;
 use rocket::serde::json::Json;
 use rocket::Request;
+use std::collections::BTreeMap;
 
 mod compose;
 mod container;
@@ -46,7 +47,7 @@ impl Fairing for CORS {
 
 //container
 #[rocket::get("/list", format = "application/json")]
-fn get_container_list() -> WebResult<Vec<Container>> {
+fn get_container_list() -> WebResult<BTreeMap<String, Container>> {
     container::list()
 }
 
