@@ -5,6 +5,7 @@
         requestDockerCompose,
     } from "../../utils/api";
     import {onMount} from "svelte";
+    import {onInterval} from "../../utils/onInterval";
 
     let containers = {
         "arg-poc": {
@@ -39,13 +40,10 @@
         }
     });
 
-    onMount(async () => {
+    onInterval(async () => {
         let composeInfo = await requestDockerCompose();
         composeInfoStore.set(composeInfo);
-    });
-
-    // TODO: display all those containers, and active if they do exist
-    // TODO: this way there will be no create container functionality, it will simply be to activate one of them, potentially with different args.
+    }, 5000);
 </script>
 
 
@@ -67,35 +65,10 @@
         justify-content: space-between;
     }
 
-    .image-entry {
-        display: flex;
-        width: 75%;
-        margin: 20px auto 20px auto;
-        padding: 10px 10px 10px 10px;
-        border: 2px solid grey;
-        border-radius: 5px;
-
-        justify-content: space-between;
-    }
-
     .entry-name {
         display: flex;
         flex-grow: 4;
         margin: auto 0 auto 20px;
-    }
-
-    .image-select {
-        display: flex;
-        width: 200px;
-        height: 50px;
-        margin: 20px 0 20px 0;
-    }
-
-    .image-namefield {
-        display: flex;
-        width: 200px;
-        height: 50px;
-        margin: 0 20px 0 20px;
     }
 </style>
 
