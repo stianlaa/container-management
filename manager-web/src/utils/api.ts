@@ -15,7 +15,7 @@ export async function requestDockerCompose(): Promise<object> {
     return null;
 }
 
-export async function requestServiceStatus(): Promise<object> {
+export async function listContainers(): Promise<object> {
     try {
         const response = await api.get("/container/list");
         return response.data;

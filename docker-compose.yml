@@ -15,7 +15,7 @@ services:
   #     - "8000:8000"
 
   arg-poc:
-    container_name: arg-poc-container
+    container_name: arg-poc
     image: stianlaa/dev-docker-repo:first-tag
     build:
       context: .
@@ -27,7 +27,7 @@ services:
     ]
 
   network-poc:
-    container_name: network-poc-container
+    container_name: network-poc
     image: stianlaa/dev-docker-repo:second-tag
     build:
       context: .
@@ -40,7 +40,7 @@ services:
       - "8000:8000"
 
   volume-poc:
-    container_name: volume-poc-container
+    container_name: volume-poc
     image: stianlaa/dev-docker-repo:third-tag
     build:
       context: .
@@ -48,7 +48,7 @@ services:
     entrypoint: [ "./run-service" ]
 
   panic-poc:
-    container_name: panic-poc-container
+    container_name: panic-poc
     image: stianlaa/dev-docker-repo:fourth-tag
     build:
       context: .

@@ -1,25 +1,17 @@
 <script>
     import {url} from '@roxi/routify'
-    import {composeInfoStore} from "./_store"
+    import {composeInfoStore, containerListStore} from "./_store"
     import {
         requestDockerCompose,
+        listContainers,
     } from "../../utils/api";
-    import {onMount} from "svelte";
     import {onInterval} from "../../utils/onInterval";
 
-    let containers = {
-        "arg-poc": {
-            name: "arg-poc",
-            description: "description1",
-            status: "Active",
-        },
-        "network-poc": {
-            name: "network-poc",
-            description: "description2",
-            status: "Inactive",
-        }
-    }
+    // TODO when a container doesn't exist, there is no status to find, this case means that the container is down, and can only be concluded from combining docker-compose info, with container list info
 
+    // TODO: it seems like service.name is something a bit different than container names, and that they can't automaticallly be used interchangably
+
+    // TODO view button only makes sense if a container is not down, button should perhaps be disabled in this case
     let composeInfo = null;
     composeInfoStore.subscribe(value => {
         if (value !== null) {
@@ -27,9 +19,18 @@
         }
     });
 
+    let containerList = null;
+    containerListStore.subscribe(value => {
+        if (value !== null) {
+            containerList = value;
+        }
+    });
+
+
     onInterval(async () => {
-        let composeInfo = await requestDockerCompose();
+        let [composeInfo, containerList] = await Promise.all([requestDockerCompose(), listContainers()]);
         composeInfoStore.set(composeInfo);
+        containerListStore.set(containerList);
     }, 5000);
 </script>
 
@@ -61,19 +62,20 @@
 
 <div class="page flex-container-vertical">
     <h4>Containers:</h4>
-    {#if composeInfo}
+    {#if composeInfo && containerList}
     {#each Object.entries(composeInfo["services"]) as [containerName, composeServiceObject]}
         <div class="container-entry flex-container-horizontal">
-            <h5 class="entry-name">{containerName}</h5>
+            <h5 class="entry-name">{containerName} ({containerList[containerName]?.state})</h5>
+
             <a href={$url("./:containerName", { containerName })}
-               class={`entity-btn btn-large ${containers[containerName]?.status === "Active" ? "blue-grey" : "yellow darken-4"}`}>
-                <i class="material-icons left">{containers[containerName]?.status === "Active" ? "info" : "warning"}</i>
+               class={`entity-btn btn-large ${containerList[containerName]?.state === "Running" ? "blue-grey" : "yellow darken-4"}`}>
+                <i class="material-icons left">{containerList[containerName]?.state === "Running" ? "info" : "warning"}</i>
                 View
             </a>
             <br/>
         </div>
     {/each}
     {:else}
-        <p>Fetching service list..</p>
+        <p>Fetching container overview..</p>
     {/if}
 </div>
