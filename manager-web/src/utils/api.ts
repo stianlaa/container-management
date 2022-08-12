@@ -26,13 +26,9 @@ export async function listContainers(): Promise<object> {
     return null;
 }
 
-export async function tryActivateService(serviceName: string) {
+export async function tryActivateContainer(containerName: string) {
     try {
-        const response = await api.put("/container/start", {}, {
-            params: {
-                services: [serviceName]
-            }
-        });
+        const response = await api.put( `/service/start/${containerName}`, {}, {});
     }
     catch (error) {
         console.error(error)
@@ -40,13 +36,9 @@ export async function tryActivateService(serviceName: string) {
     return null;
 }
 
-export async function tryDeactivateService(serviceName: string): Promise<boolean> {
+export async function tryDeactivateContainer(containerName: string): Promise<boolean> {
     try {
-        const response = await api.put("/service/stop", {}, {
-            params: {
-                services: [serviceName]
-            }
-        });
+        const response = await api.put( `/service/stop/${containerName}`, {}, {});
         return true;
     }
     catch (error) {

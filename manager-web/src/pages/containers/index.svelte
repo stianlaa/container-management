@@ -4,13 +4,14 @@
     import {
         requestDockerCompose,
         listContainers,
+        tryActivateContainer,
+        tryDeactivateContainer,
     } from "../../utils/api";
     import {onInterval} from "../../utils/onInterval";
     import {ContainerState, getContainerState} from "../../utils/container";
 
-    // TODO: it seems like service.name is something a bit different than container names, and that they can't automaticallly be used interchangably
+    // TODO introduce in_progress member, where icon is changed to spinner while working
 
-    // TODO view button only makes sense if a container is not down, button should perhaps be disabled in this case
     let composeInfo = null;
     composeInfoStore.subscribe(value => {
         if (value !== null) {
@@ -60,6 +61,10 @@
         flex-grow: 4;
         margin: auto 0 auto 20px;
     }
+
+    .entity-btn {
+        margin-left: 20px;
+    }
 </style>
 
 <div class="page flex-container-vertical">
@@ -69,16 +74,24 @@
         <div class="container-entry flex-container-horizontal">
             <h5 class="entry-name">{containerName} ({getContainerState(containerName, composeInfo, containerList)})</h5>
 
-            <button class={`entity-btn btn-large`}>
-                Start
-            </button>
+            {#if isRunning(containerName)}
+                <button class="entity-btn btn-large blue-grey"
+                        on:click={tryDeactivateContainer(containerName)}>
+                    <i class="material-icons left">{"remove_circle_outline"}</i>
+                    Stop
+                </button>
+            {:else}
+                <button class="entity-btn btn-large green darken-1"
+                        on:click={tryActivateContainer(containerName)}>
+                    <i class="material-icons left">{"add_circle_outline"}</i>
+                    Start
+                </button>
+            {/if}
 
-            <button class={`entity-btn btn-large`}>
-                Stop
-            </button>
 
             <a href={$url("./:containerName", { containerName })}
-               class={`entity-btn btn-large ${isRunning(containerName) ? "blue-grey" : "yellow darken-4"}`}>
+               disabled={!isRunning(containerName) || null}
+               class="entity-btn btn-large blue-grey">
                 <i class="material-icons left">{isRunning(containerName) ? "info" : "warning"}</i>
                 View
             </a>
