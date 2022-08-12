@@ -6,7 +6,7 @@
         listContainers,
     } from "../../utils/api";
     import {onInterval} from "../../utils/onInterval";
-    import {getContainerState} from "../../utils/container";
+    import {ContainerState, getContainerState} from "../../utils/container";
 
     // TODO: it seems like service.name is something a bit different than container names, and that they can't automaticallly be used interchangably
 
@@ -24,6 +24,10 @@
             containerList = value;
         }
     });
+
+    function isRunning(containerName) {
+        return getContainerState(containerName, composeInfo, containerList) === ContainerState.Running;
+    }
 
     onInterval(async () => {
         let [composeInfo, containerList] = await Promise.all([requestDockerCompose(), listContainers()]);
@@ -74,8 +78,8 @@
             </button>
 
             <a href={$url("./:containerName", { containerName })}
-               class={`entity-btn btn-large ${getContainerState(containerName, composeInfo, containerList) === "Running" ? "blue-grey" : "yellow darken-4"}`}>
-                <i class="material-icons left">{getContainerState(containerName, composeInfo, containerList) === "Running" ? "info" : "warning"}</i>
+               class={`entity-btn btn-large ${isRunning(containerName) ? "blue-grey" : "yellow darken-4"}`}>
+                <i class="material-icons left">{isRunning(containerName) ? "info" : "warning"}</i>
                 View
             </a>
             <br/>
