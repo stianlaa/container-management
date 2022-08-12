@@ -1,49 +1,17 @@
 extern crate dockworker;
 
-use crate::container::{Container, StartArgs, StopArgs};
+use crate::container::{Container, ContainerId, CreateContainerArgs};
 use crate::web_result::WebResult;
 use docker_compose_types::Compose;
 use dockworker::image::SummaryImage;
-use rocket::fairing::{Fairing, Info, Kind};
-use rocket::http::{Header, Method, Status};
-use rocket::response::Response;
 use rocket::serde::json::Json;
-use rocket::Request;
+use rocket_cors::AllowedHeaders;
 use std::collections::BTreeMap;
 
 mod compose;
 mod container;
 mod image;
 mod web_result;
-pub struct CORS;
-
-// From: https://github.com/SergioBenitez/Rocket/issues/2142#issuecomment-1086660848
-#[rocket::async_trait]
-impl Fairing for CORS {
-    fn info(&self) -> Info {
-        Info {
-            name: "Add CORS headers to responses",
-            kind: Kind::Response,
-        }
-    }
-
-    async fn on_response<'r>(&self, request: &'r Request<'_>, response: &mut Response<'r>) {
-        if request.method() == Method::Options {
-            response.set_status(Status::NoContent);
-            response.set_header(Header::new(
-                "Access-Control-Allow-Methods",
-                "POST, PATCH, GET, DELETE",
-            ));
-            response.set_header(Header::new(
-                "Access-Control-Allow-Headers",
-                "content-type, authorization",
-            ));
-        }
-        response.set_header(Header::new("Access-Control-Allow-Origin", "*"));
-        response.set_header(Header::new("Access-Control-Allow-Credentials", "true"));
-        response.set_header(Header::new("Vary", "Origin"));
-    }
-}
 
 //container
 #[rocket::get("/list", format = "application/json")]
@@ -75,6 +43,20 @@ fn get_docker_compose() -> WebResult<Compose> {
 
 #[rocket::main]
 async fn main() {
+    // Configure cors to allow cors requests regardless of origins, methods and headers
+    let cors = rocket_cors::CorsOptions {
+        allowed_origins: rocket_cors::AllowedOrigins::All,
+        allowed_methods: vec![rocket::http::Method::Get, rocket::http::Method::Put]
+            .into_iter()
+            .map(From::from)
+            .collect(),
+        allowed_headers: AllowedHeaders::All,
+        allow_credentials: true,
+        ..Default::default()
+    }
+    .to_cors()
+    .expect("Unable to create cors options");
+
     let _ = rocket::build()
         .mount(
             "/container/",
@@ -82,7 +64,7 @@ async fn main() {
         )
         .mount("/image/", rocket::routes![get_image_list])
         .mount("/compose/", rocket::routes![get_docker_compose])
-        .attach(CORS)
+        .attach(cors)
         .launch()
         .await;
 }
