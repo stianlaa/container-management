@@ -6,8 +6,7 @@
         listContainers,
     } from "../../utils/api";
     import {onInterval} from "../../utils/onInterval";
-
-    // TODO when a container doesn't exist, there is no status to find, this case means that the container is down, and can only be concluded from combining docker-compose info, with container list info
+    import {getContainerState} from "../../utils/container";
 
     // TODO: it seems like service.name is something a bit different than container names, and that they can't automaticallly be used interchangably
 
@@ -25,7 +24,6 @@
             containerList = value;
         }
     });
-
 
     onInterval(async () => {
         let [composeInfo, containerList] = await Promise.all([requestDockerCompose(), listContainers()]);
@@ -61,15 +59,23 @@
 </style>
 
 <div class="page flex-container-vertical">
-    <h4>Containers:</h4>
+    <h4>Containers</h4>
     {#if composeInfo && containerList}
     {#each Object.entries(composeInfo["services"]) as [containerName, composeServiceObject]}
         <div class="container-entry flex-container-horizontal">
-            <h5 class="entry-name">{containerName} ({containerList[containerName]?.state})</h5>
+            <h5 class="entry-name">{containerName} ({getContainerState(containerName, composeInfo, containerList)})</h5>
+
+            <button class={`entity-btn btn-large`}>
+                Start
+            </button>
+
+            <button class={`entity-btn btn-large`}>
+                Stop
+            </button>
 
             <a href={$url("./:containerName", { containerName })}
-               class={`entity-btn btn-large ${containerList[containerName]?.state === "Running" ? "blue-grey" : "yellow darken-4"}`}>
-                <i class="material-icons left">{containerList[containerName]?.state === "Running" ? "info" : "warning"}</i>
+               class={`entity-btn btn-large ${getContainerState(containerName, composeInfo, containerList) === "Running" ? "blue-grey" : "yellow darken-4"}`}>
+                <i class="material-icons left">{getContainerState(containerName, composeInfo, containerList) === "Running" ? "info" : "warning"}</i>
                 View
             </a>
             <br/>
