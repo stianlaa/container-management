@@ -8,7 +8,7 @@
         tryDeactivateContainer,
     } from "../../utils/api";
     import {onInterval} from "../../utils/onInterval";
-    import {ContainerState, getContainerState} from "../../utils/container";
+    import {ContainerState, createActivateArgs, getContainerId, getContainerState} from "../../utils/container";
 
     // TODO introduce in_progress member, where icon is changed to spinner while working
 
@@ -76,18 +76,17 @@
 
             {#if isRunning(containerName)}
                 <button class="entity-btn btn-large blue-grey"
-                        on:click={tryDeactivateContainer(containerName)}>
+                        on:click={tryDeactivateContainer(getContainerId(containerName, containerList))}>
                     <i class="material-icons left">{"remove_circle_outline"}</i>
                     Stop
                 </button>
             {:else}
                 <button class="entity-btn btn-large green darken-1"
-                        on:click={tryActivateContainer(containerName)}>
+                        on:click={tryActivateContainer(getContainerId(containerName, containerList))}>
                     <i class="material-icons left">{"add_circle_outline"}</i>
                     Start
                 </button>
             {/if}
-
 
             <a href={$url("./:containerName", { containerName })}
                disabled={!isRunning(containerName) || null}

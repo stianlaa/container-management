@@ -1,8 +1,8 @@
 export const ContainerState = {
     Created: "Created",
-    Running:"Running",
+    Running: "Running",
     Restarting: "Restarting", // A running container that is in the process of restarting
-    Exited: "Exited" , // A running container that is stopped.
+    Exited: "Exited", // A running container that is stopped.
     Paused: "Paused", // A running container that is paused
     Dead: "Dead",
     Unknown: "Unknown",
@@ -14,4 +14,17 @@ export function getContainerState(containerName, composeInfo, containerList) {
         return ContainerState.Down;
     }
     return containerList[containerName]?.state;
+}
+
+export function createActivateArgs(containerName, composeInfo) {
+    return {
+        image_name: composeInfo["services"][containerName].image,
+        container_name: containerName,
+    };
+}
+
+export function getContainerId(containerName, containerList) {
+    return {
+        container_id: containerList[containerName].id,
+    };
 }

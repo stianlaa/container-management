@@ -20,13 +20,25 @@ fn get_container_list() -> WebResult<BTreeMap<String, Container>> {
 }
 
 #[rocket::put("/start", format = "application/json", data = "<data>")]
-fn start_containers(data: Json<StartArgs>) -> WebResult<()> {
+fn start_container(data: Json<ContainerId>) -> WebResult<()> {
     container::start(data.0)
 }
 
 #[rocket::put("/stop", format = "application/json", data = "<data>")]
-fn stop_containers(data: Json<StopArgs>) -> WebResult<()> {
+fn stop_container(data: Json<ContainerId>) -> WebResult<()> {
+    // TODO: fix, sometimes docker gives permission denied due to apparmor, atleast on ubuntu 20.04
+    // sudo aa-remove-unknown fixes it temporarily in a gentle way, but should be resolved
     container::stop(data.0)
+}
+
+#[rocket::put("/create", format = "application/json", data = "<data>")]
+fn create_container(data: Json<CreateContainerArgs>) -> WebResult<()> {
+    container::create(data.0)
+}
+
+#[rocket::put("/remove", format = "application/json", data = "<data>")]
+fn remove_container(data: Json<ContainerId>) -> WebResult<()> {
+    container::remove(data.0)
 }
 
 //image
@@ -60,7 +72,13 @@ async fn main() {
     let _ = rocket::build()
         .mount(
             "/container/",
-            rocket::routes![get_container_list, start_containers, stop_containers],
+            rocket::routes![
+                get_container_list,
+                start_container,
+                stop_container,
+                create_container,
+                remove_container,
+            ],
         )
         .mount("/image/", rocket::routes![get_image_list])
         .mount("/compose/", rocket::routes![get_docker_compose])

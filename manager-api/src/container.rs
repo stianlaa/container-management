@@ -30,14 +30,14 @@ impl From<String> for State {
     }
 }
 
-#[derive(Debug, Deserialize)]
-pub struct StartArgs {
+#[derive(Debug, Deserialize, Serialize)]
+pub struct CreateContainerArgs {
     pub image_name: String,
     pub container_name: String,
 }
 
 #[derive(Debug, Deserialize)]
-pub struct StopArgs {
+pub struct ContainerId {
     pub container_id: String,
 }
 
@@ -51,7 +51,6 @@ pub struct Container {
 }
 
 impl From<dockworker::container::Container> for Container {
-    // TODO:  apparantly container names from the api start with /, investigate and/or fix
     fn from(container: dockworker::container::Container) -> Self {
         Container {
             id: container.Id,
@@ -72,7 +71,7 @@ impl From<dockworker::container::Container> for Container {
 pub fn list() -> WebResult<BTreeMap<String, Container>> {
     let docker = Docker::connect_with_defaults().unwrap();
     let filter = ContainerFilters::new();
-    match docker.list_containers(None, None, None, filter) {
+    match docker.list_containers(Some(true), None, None, filter) {
         Ok(container_list) => {
             let mapped_containers: BTreeMap<String, Container> = container_list
                 .into_iter()
@@ -88,27 +87,18 @@ pub fn list() -> WebResult<BTreeMap<String, Container>> {
     }
 }
 
-pub fn start(start_args: StartArgs) -> WebResult<()> {
+pub fn start(start_args: ContainerId) -> WebResult<()> {
     let docker = Docker::connect_with_defaults().unwrap();
-    let mut create = ContainerCreateOptions::new(start_args.image_name.as_str());
-    create.tty(true);
-
-    match docker.create_container(Some(start_args.container_name.as_str()), &create) {
-        Ok(container) => match docker.start_container(&container.id) {
-            Ok(_) => WebResult::Ok(()),
-            Err(error) => WebResult::Err(WebError::new(
-                500,
-                format!("unable to start container: {:?}", error),
-            )),
-        },
+    match docker.start_container(&start_args.container_id) {
+        Ok(_) => WebResult::Ok(()),
         Err(error) => WebResult::Err(WebError::new(
             500,
-            format!("unable to create container: {:?}", error),
+            format!("unable to start container: {:?}", error),
         )),
     }
 }
 
-pub fn stop(stop_args: StopArgs) -> WebResult<()> {
+pub fn stop(stop_args: ContainerId) -> WebResult<()> {
     let docker = Docker::connect_with_defaults().unwrap();
     // TODO receive and deserialize duration from request
     match docker.stop_container(stop_args.container_id.as_str(), Duration::from_secs(1)) {
@@ -116,6 +106,31 @@ pub fn stop(stop_args: StopArgs) -> WebResult<()> {
         Err(error) => WebResult::Err(WebError::new(
             500,
             format!("unable to stop container: {:?}", error),
+        )),
+    }
+}
+
+pub fn create(create_args: CreateContainerArgs) -> WebResult<()> {
+    let docker = Docker::connect_with_defaults().unwrap();
+    let mut create = ContainerCreateOptions::new(create_args.image_name.as_str());
+    create.tty(true);
+
+    match docker.create_container(Some(create_args.container_name.as_str()), &create) {
+        Ok(_container) => WebResult::Ok(()),
+        Err(error) => WebResult::Err(WebError::new(
+            500,
+            format!("unable to create container: {:?}", error),
+        )),
+    }
+}
+
+pub fn remove(remove_args: ContainerId) -> WebResult<()> {
+    let docker = Docker::connect_with_defaults().unwrap();
+    match docker.remove_container(remove_args.container_id.as_str(), None, Some(true), None) {
+        Ok(_) => WebResult::Ok(()),
+        Err(error) => WebResult::Err(WebError::new(
+            500,
+            format!("unable to remove container: {:?}", error),
         )),
     }
 }
