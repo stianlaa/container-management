@@ -5,10 +5,10 @@
         requestDockerCompose,
         listContainers,
         tryActivateContainer,
-        tryDeactivateContainer,
+        tryDeactivateContainer, tryCreateContainer,
     } from "../../utils/api";
     import {onInterval} from "../../utils/onInterval";
-    import {ContainerState, createActivateArgs, getContainerId, getContainerState} from "../../utils/container";
+    import {ContainerState, createContainerArgs, getContainerId, getContainerState} from "../../utils/container";
 
     // TODO introduce in_progress member, where icon is changed to spinner while working
 
@@ -28,6 +28,14 @@
 
     function isRunning(containerName) {
         return getContainerState(containerName, composeInfo, containerList) === ContainerState.Running;
+    }
+
+    function onActivateContainerClick(containerName) {
+        if (getContainerState(containerName, composeInfo, containerList) === ContainerState.Down) {
+            tryCreateContainer(createContainerArgs(containerName, composeInfo))
+        } else {
+            tryActivateContainer(getContainerId(containerName, containerList))
+        }
     }
 
     onInterval(async () => {
@@ -78,13 +86,13 @@
                 <button class="entity-btn btn-large blue-grey"
                         on:click={tryDeactivateContainer(getContainerId(containerName, containerList))}>
                     <i class="material-icons left">{"remove_circle_outline"}</i>
-                    Stop
+                    Deactivate
                 </button>
             {:else}
                 <button class="entity-btn btn-large green darken-1"
-                        on:click={tryActivateContainer(getContainerId(containerName, containerList))}>
+                        on:click={onActivateContainerClick(containerName)}>
                     <i class="material-icons left">{"add_circle_outline"}</i>
-                    Start
+                    {getContainerState(containerName, composeInfo, containerList) === ContainerState.Down ? "Create" : "Activate"}
                 </button>
             {/if}
 

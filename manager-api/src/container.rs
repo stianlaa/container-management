@@ -30,10 +30,16 @@ impl From<String> for State {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize)]
 pub struct CreateContainerArgs {
     pub image_name: String,
     pub container_name: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct CreateContainerResponse {
+    pub id: String,
+    pub warnings: Option<Vec<String>>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -110,13 +116,16 @@ pub fn stop(stop_args: ContainerId) -> WebResult<()> {
     }
 }
 
-pub fn create(create_args: CreateContainerArgs) -> WebResult<()> {
+pub fn create(create_args: CreateContainerArgs) -> WebResult<CreateContainerResponse> {
     let docker = Docker::connect_with_defaults().unwrap();
     let mut create = ContainerCreateOptions::new(create_args.image_name.as_str());
     create.tty(true);
 
     match docker.create_container(Some(create_args.container_name.as_str()), &create) {
-        Ok(_container) => WebResult::Ok(()),
+        Ok(creationResponse) => WebResult::Ok(CreateContainerResponse {
+            id: creationResponse.id,
+            warnings: creationResponse.warnings,
+        }),
         Err(error) => WebResult::Err(WebError::new(
             500,
             format!("unable to create container: {:?}", error),

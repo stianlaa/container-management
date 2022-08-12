@@ -1,6 +1,6 @@
 extern crate dockworker;
 
-use crate::container::{Container, ContainerId, CreateContainerArgs};
+use crate::container::{Container, ContainerId, CreateContainerArgs, CreateContainerResponse};
 use crate::web_result::WebResult;
 use docker_compose_types::Compose;
 use dockworker::image::SummaryImage;
@@ -32,7 +32,7 @@ fn stop_container(data: Json<ContainerId>) -> WebResult<()> {
 }
 
 #[rocket::put("/create", format = "application/json", data = "<data>")]
-fn create_container(data: Json<CreateContainerArgs>) -> WebResult<()> {
+fn create_container(data: Json<CreateContainerArgs>) -> WebResult<CreateContainerResponse> {
     container::create(data.0)
 }
 

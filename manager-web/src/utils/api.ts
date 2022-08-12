@@ -43,3 +43,13 @@ export async function tryDeactivateContainer(deactivateArgs): Promise<boolean> {
     }
     return false;
 }
+
+export async function tryCreateContainer(createContainerArgs) {
+    try {
+        const response = await api.put("/container/create", createContainerArgs);
+        return response.data;
+    } catch (error) {
+        console.error(error)
+    }
+    return null;
+}

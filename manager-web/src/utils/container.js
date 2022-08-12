@@ -16,7 +16,7 @@ export function getContainerState(containerName, composeInfo, containerList) {
     return containerList[containerName]?.state;
 }
 
-export function createActivateArgs(containerName, composeInfo) {
+export function createContainerArgs(containerName, composeInfo) {
     return {
         image_name: composeInfo["services"][containerName].image,
         container_name: containerName,
