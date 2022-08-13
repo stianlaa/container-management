@@ -9,22 +9,16 @@ export const ContainerState = {
     Down: "Down", // An entry exists docker-compose, but no container exists
 }
 
-export function getContainerState(containerName, composeInfo, containerList) {
-    if (composeInfo["services"][containerName] && containerList[containerName]?.state == null) {
+export function getContainerState(containerName, composeInfo, containerInfo) {
+    if (containerInfo?.state == null) {
         return ContainerState.Down;
     }
-    return containerList[containerName]?.state;
+    return containerInfo?.state;
 }
 
 export function createContainerArgs(containerName, composeInfo) {
     return {
-        image_name: composeInfo["services"][containerName].image,
+        image_name: composeInfo.image,
         container_name: containerName,
-    };
-}
-
-export function getContainerId(containerName, containerList) {
-    return {
-        container_id: containerList[containerName].id,
     };
 }
