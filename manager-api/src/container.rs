@@ -118,7 +118,38 @@ impl From<dockworker::container::ContainerInfo> for ContainerInfo {
             process_label: container.ProcessLabel,
             resolvconf_path: container.ResolvConfPath,
             restart_count: container.RestartCount,
+            // TODO rename struct and use to status, better name
             state: container.State.Status.into(), // TODO map entire object? consider value of State? Rename current State to Status
+        }
+    }
+}
+
+#[derive(Debug, Deserialize)]
+pub struct LogFilter {
+    pub since: Option<i64>,
+    pub until: Option<i64>,
+    pub tail: Option<i64>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct Log {
+    /// [(timestamp, message),...]
+    pub messages: Vec<(String, String)>,
+}
+
+impl From<Vec<String>> for Log {
+    fn from(output: Vec<String>) -> Self {
+        Log {
+            messages: output
+                .into_iter()
+                .map(|entry| {
+                    // TODO fragile and perhaps inefficient, improve
+                    let mut parts = entry.splitn(2, ' ').map(String::from);
+                    let timestamp = parts.next().unwrap();
+                    let message = parts.next().unwrap();
+                    (timestamp, message)
+                })
+                .collect(),
         }
     }
 }
@@ -153,8 +184,33 @@ pub fn get_info(container_id: String) -> WebResult<ContainerInfo> {
     }
 }
 
-// TODO:
-//    docker.log_container()
+pub fn get_container_logs(container_id: String, log_filter: LogFilter) -> WebResult<Log> {
+    let docker = Docker::connect_with_defaults().unwrap();
+    let log_options = dockworker::ContainerLogOptions {
+        stdout: true,
+        stderr: true,
+        since: log_filter.since,
+        until: log_filter.until,
+        timestamps: Some(true),
+        tail: log_filter.tail,
+        follow: false,
+    };
+    match docker.log_container(container_id.as_str(), &log_options) {
+        Ok(mut log_response) => match log_response.output() {
+            Ok(output) => WebResult::Ok(Log::from(
+                output.lines().map(String::from).collect::<Vec<String>>(),
+            )),
+            Err(error) => WebResult::Err(WebError::new(
+                500,
+                format!("unable to get log output: {:?}", error),
+            )),
+        },
+        Err(error) => WebResult::Err(WebError::new(
+            500,
+            format!("unable to get container logs: {:?}", error),
+        )),
+    }
+}
 
 pub fn start(start_args: ContainerId) -> WebResult<()> {
     let docker = Docker::connect_with_defaults().unwrap();

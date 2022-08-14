@@ -53,3 +53,15 @@ export async function tryCreateContainer(createContainerArgs) {
     }
     return null;
 }
+
+export async function requestContainerInfo(createContainerArgs) {
+    return {}
+}
+
+export async function requestContainerLogsLast(createContainerArgs) {
+    return {}
+}
+
+export async function requestContainerLogsSpan(createContainerArgs) {
+    return {}
+}

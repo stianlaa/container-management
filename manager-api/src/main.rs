@@ -1,7 +1,8 @@
 extern crate dockworker;
 
 use crate::container::{
-    Container, ContainerId, ContainerInfo, CreateContainerArgs, CreateContainerResponse,
+    Container, ContainerId, ContainerInfo, CreateContainerArgs, CreateContainerResponse, Log,
+    LogFilter,
 };
 use crate::web_result::WebResult;
 use docker_compose_types::Compose;
@@ -24,6 +25,19 @@ fn get_container_list() -> WebResult<BTreeMap<String, Container>> {
 #[rocket::get("/info?<container_id>", format = "application/json")]
 fn get_container_info(container_id: String) -> WebResult<ContainerInfo> {
     container::get_info(container_id)
+}
+
+#[rocket::get(
+    "/logs?<container_id>&<since>&<until>&<tail>",
+    format = "application/json"
+)]
+fn get_container_logs(
+    container_id: String,
+    since: Option<i64>,
+    until: Option<i64>,
+    tail: Option<i64>,
+) -> WebResult<Log> {
+    container::get_container_logs(container_id, LogFilter { since, until, tail })
 }
 
 #[rocket::put("/start", format = "application/json", data = "<data>")]
@@ -82,6 +96,7 @@ async fn main() {
             rocket::routes![
                 get_container_list,
                 get_container_info,
+                get_container_logs,
                 start_container,
                 stop_container,
                 create_container,
