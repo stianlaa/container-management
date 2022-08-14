@@ -1,21 +1,20 @@
 <script lang="ts">
     import {
-        listContainers,
         requestContainerInfo,
         requestContainerLogsLast,
-        requestContainerLogsSpan, requestDockerCompose,
+        requestContainerLogsSpan,
     } from "../../utils/api.ts";
     import {afterUpdate, onMount} from "svelte";
     import {onInterval} from "../../utils/onInterval.js";
-    import {containerListStore, composeInfoStore} from "./_store.js"
+    import {composeInfoStore} from "./_store.js"
     import {tryActivateContainer, tryDeactivateContainer} from "../../utils/api";
 
     export let containerName = null;
 
-    const CONTAINER_LOGS_UPDATE_INTERVAL_MS = 2000;
+    const UPDATE_INTERVAL_MS = 2000;
 
     let log = {
-        entries: "",
+        messages: "",
         lastUpdatedTimestamp: Date.now(),
         autoScroll: true,
         updateError: false,
@@ -31,19 +30,19 @@
         }
     });
 
-    let containerList = null;
-    containerListStore.subscribe(value => {
-        if (value !== null) {
-            containerList = value;
-        }
+    onMount(async () => {
+        containerInfo = await requestContainerInfo(containerName);
+        log.messages += await requestContainerLogsLast(containerInfo.id, 100);
     });
 
-    onInterval(async () => await updateInfo(), CONTAINER_LOGS_UPDATE_INTERVAL_MS);
+    onInterval(async () => await fetchLogs(), UPDATE_INTERVAL_MS);
 
-    async function updateInfo() {
-        let [composeInfo, containerList] = await Promise.all([requestDockerCompose(), listContainers()]);
-        composeInfoStore.set(composeInfo);
-        containerListStore.set(containerList);
+    async function fetchLogs() {
+        if (containerInfo !== null) {
+            let now = Date.now();
+            log.messages += await requestContainerLogsSpan(containerInfo.id, log.lastUpdatedTimestamp, now);
+            log.lastUpdatedTimestamp = now;
+        }
     }
 
     let logContent;
@@ -60,6 +59,7 @@
         font-family: monospace;
         white-space: pre;
         resize: none;
+        height: 600px;
     }
 
     .button-row > .btn {
@@ -89,8 +89,7 @@
 
 <div class="page flex-container-vertical">
     <h4>{containerName}</h4>
-    <textarea bind:this={logContent} class="flex-item-grow container-log-textfield" readonly>{log.entries}</textarea>
-
+    <textarea bind:this={logContent} class="flex-item-grow container-log-textfield" readonly>{log.messages}</textarea>
 
     <div class="log-info flex-item-shrink flex-container-horizontal">
         <p class="flex-item-grow">={new Date(log.lastUpdatedTimestamp).toLocaleString()}=</p>
@@ -105,14 +104,15 @@
     </div>
 
     <div class="container-info">
-       <p>Status:
+        <p>Status:
         </p>
         <p><b>Version:</b> {containerInfo === null ? "unknown" : containerInfo.version}</p>
         <p><b>Dependency:</b> {containerInfo === null ? "unknown" : containerInfo.dependency}</p>
         <p><b>Command-line:</b></p>
         <input bind:value={commandLineArgsInput} on:input={() => commandLineArgsButtonDisabled = false}/>
         <a class={`btn blue-grey ${commandLineArgsButtonDisabled ? "disabled" : ""}`}
-           on:click={console.log("modifyContainerCommandLineArgs(containerName, commandLineArgsInput)")}>Save and restart</a>
+           on:click={console.log("modifyContainerCommandLineArgs(containerName, commandLineArgsInput)")}>Save and
+            restart</a>
     </div>
 
     <div class="button-row flex-container-horizontal">
@@ -123,6 +123,8 @@
         <button class={`flex-item-shrink btn blue-grey`}
                 on:click={tryActivateContainer(containerName)}>Activate
         </button>
-        <button class="flex-item-shrink btn blue-grey" on:click={console.log("tryRestartContainer(containerName)")}>Restart</button>
+        <button class="flex-item-shrink btn blue-grey" on:click={console.log("tryRestartContainer(containerName)")}>
+            Restart
+        </button>
     </div>
 </div>

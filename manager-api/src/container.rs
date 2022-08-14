@@ -173,6 +173,28 @@ pub fn list() -> WebResult<BTreeMap<String, Container>> {
     }
 }
 
+pub fn get_info_by_name(container_name: String) -> WebResult<ContainerInfo> {
+    let docker = Docker::connect_with_defaults().unwrap();
+    match docker.list_containers(Some(true), None, None, ContainerFilters::new()) {
+        Ok(container_list) => {
+            match container_list
+                .into_iter()
+                .find(|container| container.Names.contains(&container_name))
+            {
+                Some(container) => get_info(container.Id),
+                None => WebResult::Err(WebError::new(
+                    500,
+                    format!("unable to find container with name: {container_name:?}"),
+                )),
+            }
+        }
+        Err(error) => WebResult::Err(WebError::new(
+            500,
+            format!("unable to list containers: {:?}", error),
+        )),
+    }
+}
+
 pub fn get_info(container_id: String) -> WebResult<ContainerInfo> {
     let docker = Docker::connect_with_defaults().unwrap();
     match docker.container_info(&container_id) {

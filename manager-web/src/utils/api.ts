@@ -54,14 +54,51 @@ export async function tryCreateContainer(createContainerArgs) {
     return null;
 }
 
-export async function requestContainerInfo(createContainerArgs) {
-    return {}
+export async function requestContainerInfo(container_id): Promise<string> {
+    try {
+        const response = await api.get("/container/info/", {
+            params: {
+                container_id: container_id,
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error(error)
+    }
+    return null;
 }
 
-export async function requestContainerLogsLast(createContainerArgs) {
-    return {}
+async function requestContainerLogs(request): Promise<string> {
+    try {
+        const response = await api.get("/container/logs", request);
+        return response.data.messages.map(([time, message]) => {
+            let date = new Date(time).toLocaleString();
+            return `[${date}] ${message}\n`;
+        }).join("");
+    } catch (error) {
+        console.error(error)
+    }
+    return null;
 }
 
-export async function requestContainerLogsSpan(createContainerArgs) {
-    return {}
+export async function requestContainerLogsSpan(container_id: string, since: number, until: number): Promise<string> {
+    let request = {
+        params: {
+            container_id: container_id,
+            since: Math.floor(since/1000),
+            until: Math.floor(until/1000),
+        }
+    };
+    return await requestContainerLogs(request);
+}
+
+
+export async function requestContainerLogsLast(container_id: string, count: Number) {
+    let request = {
+        params: {
+            container_id: container_id,
+            tail: count,
+        }
+    };
+    return await requestContainerLogs(request);
 }

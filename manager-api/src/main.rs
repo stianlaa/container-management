@@ -27,6 +27,11 @@ fn get_container_info(container_id: String) -> WebResult<ContainerInfo> {
     container::get_info(container_id)
 }
 
+#[rocket::get("/info_by_name?<container_name>", format = "application/json")]
+fn get_container_info_by_name(container_name: String) -> WebResult<ContainerInfo> {
+    container::get_info_by_name(container_name)
+}
+
 #[rocket::get(
     "/logs?<container_id>&<since>&<until>&<tail>",
     format = "application/json"
@@ -96,6 +101,7 @@ async fn main() {
             rocket::routes![
                 get_container_list,
                 get_container_info,
+                get_container_info_by_name,
                 get_container_logs,
                 start_container,
                 stop_container,
