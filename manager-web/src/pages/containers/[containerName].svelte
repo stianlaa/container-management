@@ -8,6 +8,7 @@
     import {onInterval} from "../../utils/onInterval.js";
     import {composeInfoStore} from "./_store.js"
     import {tryActivateContainer, tryDeactivateContainer} from "../../utils/api";
+    import {formatDuration} from "../../utils/dateTimeUtils"
 
     export let containerName = null;
 
@@ -40,8 +41,14 @@
     async function fetchLogs() {
         if (containerInfo !== null) {
             let now = Date.now();
-            log.messages += await requestContainerLogsSpan(containerInfo.id, log.lastUpdatedTimestamp, now);
-            log.lastUpdatedTimestamp = now;
+             let logResponse = await requestContainerLogsSpan(containerInfo.id, log.lastUpdatedTimestamp, now);
+             if (logResponse == null) {
+                 log.updateError = true;
+             } else {
+                 log.updateError = false;
+                 log.messages += logResponse;
+                 log.lastUpdatedTimestamp = now;
+             }
         }
     }
 
@@ -95,7 +102,7 @@
         <p class="flex-item-grow">={new Date(log.lastUpdatedTimestamp).toLocaleString()}=</p>
         {#if log.updateError}
             <strong class="flex-item-grow log-outdated-text">⚠️ Outdated log update
-                ⚠️ {"formatDuration(Date.now() - log.lastUpdatedTimestamp)"} old</strong>
+                ⚠️ {formatDuration(Date.now() - log.lastUpdatedTimestamp)} old</strong>
         {/if}
         <label class="flex-item-shrink flex-container-horizontal valign-wrapper">
             <span class="flex-item-grow">Autoscroll:</span>
