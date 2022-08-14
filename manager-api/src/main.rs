@@ -1,6 +1,8 @@
 extern crate dockworker;
 
-use crate::container::{Container, ContainerId, CreateContainerArgs, CreateContainerResponse};
+use crate::container::{
+    Container, ContainerId, ContainerInfo, CreateContainerArgs, CreateContainerResponse,
+};
 use crate::web_result::WebResult;
 use docker_compose_types::Compose;
 use dockworker::image::SummaryImage;
@@ -17,6 +19,11 @@ mod web_result;
 #[rocket::get("/list", format = "application/json")]
 fn get_container_list() -> WebResult<BTreeMap<String, Container>> {
     container::list()
+}
+
+#[rocket::get("/info?<container_id>", format = "application/json")]
+fn get_container_info(container_id: String) -> WebResult<ContainerInfo> {
+    container::get_info(container_id)
 }
 
 #[rocket::put("/start", format = "application/json", data = "<data>")]
@@ -74,6 +81,7 @@ async fn main() {
             "/container/",
             rocket::routes![
                 get_container_list,
+                get_container_info,
                 start_container,
                 stop_container,
                 create_container,

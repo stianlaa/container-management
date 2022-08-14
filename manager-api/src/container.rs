@@ -62,7 +62,7 @@ impl From<dockworker::container::Container> for Container {
             id: container.Id,
             image: container.Image,
             command: container.Command,
-            state: State::from(container.State),
+            state: container.State.into(),
             name: container
                 .Names
                 .get(0)
@@ -70,6 +70,55 @@ impl From<dockworker::container::Container> for Container {
                 .get_or_insert(&String::from("missing_name"))
                 .clone()
                 .replace('/', ""),
+        }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct ContainerInfo {
+    pub app_armor_profile: String,
+    pub args: Vec<String>,
+    //pub config: Config, // TODO add or remove
+    pub created: String,
+    pub driver: String,
+    pub hostname_path: String,
+    pub hosts_path: String,
+    pub id: String,
+    pub image: String,
+    pub log_path: String,
+    pub mount_label: String,
+    // pub mounts: Vec<Mount>,
+    pub name: String,
+    // pub networksettings: NetworkSettings,
+    pub path: String,
+    pub process_label: String,
+    pub resolvconf_path: String,
+    pub restart_count: u64,
+    pub state: State,
+}
+
+impl From<dockworker::container::ContainerInfo> for ContainerInfo {
+    fn from(container: dockworker::container::ContainerInfo) -> Self {
+        ContainerInfo {
+            app_armor_profile: container.AppArmorProfile,
+            args: container.Args,
+            // config: container.Config,
+            created: container.Created,
+            driver: container.Driver,
+            hostname_path: container.HostnamePath,
+            hosts_path: container.HostsPath,
+            id: container.Id,
+            image: container.Image,
+            log_path: container.LogPath,
+            mount_label: container.MountLabel,
+            // mounts: container.Mounts,
+            name: container.Name,
+            // network_settings: container.NetworkSettings,
+            path: container.Path,
+            process_label: container.ProcessLabel,
+            resolvconf_path: container.ResolvConfPath,
+            restart_count: container.RestartCount,
+            state: container.State.Status.into(), // TODO map entire object? consider value of State? Rename current State to Status
         }
     }
 }
@@ -92,6 +141,20 @@ pub fn list() -> WebResult<BTreeMap<String, Container>> {
         )),
     }
 }
+
+pub fn get_info(container_id: String) -> WebResult<ContainerInfo> {
+    let docker = Docker::connect_with_defaults().unwrap();
+    match docker.container_info(&container_id) {
+        Ok(container_info) => WebResult::Ok(container_info.into()),
+        Err(error) => WebResult::Err(WebError::new(
+            500,
+            format!("unable to get container info: {:?}", error),
+        )),
+    }
+}
+
+// TODO:
+//    docker.log_container()
 
 pub fn start(start_args: ContainerId) -> WebResult<()> {
     let docker = Docker::connect_with_defaults().unwrap();
@@ -122,9 +185,9 @@ pub fn create(create_args: CreateContainerArgs) -> WebResult<CreateContainerResp
     create.tty(true);
 
     match docker.create_container(Some(create_args.container_name.as_str()), &create) {
-        Ok(creationResponse) => WebResult::Ok(CreateContainerResponse {
-            id: creationResponse.id,
-            warnings: creationResponse.warnings,
+        Ok(creation_response) => WebResult::Ok(CreateContainerResponse {
+            id: creation_response.id,
+            warnings: creation_response.warnings,
         }),
         Err(error) => WebResult::Err(WebError::new(
             500,
