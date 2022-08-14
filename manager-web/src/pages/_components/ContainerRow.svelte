@@ -6,6 +6,7 @@
     } from "../../utils/api";
     import {ContainerState, createContainerArgs, getContainerState} from "../../utils/container";
     import {Circle} from "svelte-loading-spinners";
+    import StatusTag from "./StatusTag.svelte";
 
     export let name;
     export let composeInfo;
@@ -13,13 +14,13 @@
     export let updateInfo;
     let requestInProgress = false;
 
-    function isRunning(name, composeInfo, containerInfo) {
-        return getContainerState(name, composeInfo, containerInfo) === ContainerState.Running;
+    function isRunning(name, containerInfo) {
+        return getContainerState(name, containerInfo) === ContainerState.Running;
     }
 
     function onActivateContainerClick(name) {
         requestInProgress = true;
-        if (getContainerState(name, composeInfo, containerInfo) === ContainerState.Down) {
+        if (getContainerState(name, containerInfo) === ContainerState.Down) {
             tryCreateContainer(createContainerArgs(name, composeInfo))
                 .then(() => {requestInProgress = false; updateInfo()})
         } else {
@@ -33,21 +34,7 @@
         tryDeactivateContainer(containerId)
             .then(() => {requestInProgress = false; updateInfo()})
     }
-
-    function statusTag(name, composeInfo, containerInfo) {
-        switch (getContainerState(name, composeInfo, containerInfo)) {
-            case ContainerState.Running:
-                return {icon: "thumb_up", color: "green lighten-3"};
-            case ContainerState.Created:
-            case ContainerState.Unknown:
-            case ContainerState.Restarting:
-                return {icon: "live_help", color: "grey lighten-3"};
-            default:
-                return {icon: "thumb_down", color: "red lighten-3"};
-        }
-    }
 </script>
-
 
 <style>
     .container-row {
@@ -69,13 +56,6 @@
     .entity-btn {
         margin-left: 20px;
     }
-
-    .status-tag {
-        margin: auto auto auto 20px;
-        border-radius: 15px;
-        padding: 8px;
-        color: white;
-    }
 </style>
 
 <div class="page flex-container-vertical">
@@ -86,13 +66,10 @@
         {#if requestInProgress}
             <Circle size="50" color="#607d8b"/>
         {:else}
-            <div class={`status-tag ${statusTag(name, composeInfo, containerInfo).color}`}>
-                <i class="material-icons left">{statusTag(name, composeInfo, containerInfo).icon}</i>
-                <h6 style="display: inline">({getContainerState(name, composeInfo, containerInfo)})</h6>
-            </div>
+            <StatusTag containerName={name} containerInfo={containerInfo}/>
         {/if}
 
-        {#if isRunning(name, composeInfo, containerInfo)}
+        {#if isRunning(name, containerInfo)}
             <button class="entity-btn btn-large blue-grey"
                     on:click={onDeactivateContainerClick(containerInfo.id)}>
                 <i class="material-icons left">{"remove_circle_outline"}</i>
@@ -102,12 +79,12 @@
             <button class="entity-btn btn-large green darken-1"
                     on:click={onActivateContainerClick(name)}>
                 <i class="material-icons left">{"add_circle_outline"}</i>
-                {getContainerState(name, composeInfo, containerInfo) === ContainerState.Down ? "Create" : "Activate"}
+                {getContainerState(name, containerInfo) === ContainerState.Down ? "Create" : "Activate"}
             </button>
         {/if}
 
         <a href={$url("./:name", { name })}
-           disabled={!isRunning(name, composeInfo, containerInfo) || null}
+           disabled={!isRunning(name, containerInfo) || null}
            class="entity-btn btn-large blue-grey">
             View
         </a>

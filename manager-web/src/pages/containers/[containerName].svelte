@@ -9,6 +9,7 @@
     import {composeInfoStore} from "./_store.js"
     import {tryActivateContainer, tryDeactivateContainer} from "../../utils/api";
     import {formatDuration} from "../../utils/dateTimeUtils"
+    import StatusTag from "../_components/StatusTag.svelte";
 
     export let containerName = null;
 
@@ -42,7 +43,7 @@
         if (containerInfo !== null) {
             let now = Date.now();
              let logResponse = await requestContainerLogsSpan(containerInfo.id, log.lastUpdatedTimestamp, now);
-             if (logResponse == null) {
+             if (logResponse === null) {
                  log.updateError = true;
              } else {
                  log.updateError = false;
@@ -111,10 +112,10 @@
     </div>
 
     <div class="container-info">
-        <p>Status:
-        </p>
-        <p><b>Version:</b> {containerInfo === null ? "unknown" : containerInfo.version}</p>
-        <p><b>Dependency:</b> {containerInfo === null ? "unknown" : containerInfo.dependency}</p>
+        <StatusTag containerName={containerName} containerInfo={containerInfo}/>
+
+        <p><b>Version: (To-be-decided how to store and fetch)</b> {containerInfo === null ? "unknown" : containerInfo.version}</p>
+        <p><b>Dependency:</b> {dockerComposeInfo?.services[containerName] === null ? "none" : dockerComposeInfo.services[containerName]?.depends_on}</p>
         <p><b>Command-line:</b></p>
         <input bind:value={commandLineArgsInput} on:input={() => commandLineArgsButtonDisabled = false}/>
         <a class={`btn blue-grey ${commandLineArgsButtonDisabled ? "disabled" : ""}`}

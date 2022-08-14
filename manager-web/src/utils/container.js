@@ -9,7 +9,7 @@ export const ContainerState = {
     Down: "Down", // An entry exists docker-compose, but no container exists
 }
 
-export function getContainerState(containerName, composeInfo, containerInfo) {
+export function getContainerState(containerName, containerInfo) {
     if (containerInfo?.state == null) {
         return ContainerState.Down;
     }
