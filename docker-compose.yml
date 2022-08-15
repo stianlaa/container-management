@@ -16,7 +16,7 @@ services:
 
   arg-poc:
     container_name: arg-poc
-    image: stianlaa/dev-docker-repo:first-tag
+    image: stianlaa/dev-docker-repo:arg-poc_${NU_VER}
     build:
       context: .
       dockerfile: arg-poc/Dockerfile
@@ -28,7 +28,7 @@ services:
 
   network-poc:
     container_name: network-poc
-    image: stianlaa/dev-docker-repo:second-tag
+    image: stianlaa/dev-docker-repo:network-poc_${NU_VER}
     build:
       context: .
       dockerfile: network-poc/Dockerfile
@@ -41,7 +41,7 @@ services:
 
   volume-poc:
     container_name: volume-poc
-    image: stianlaa/dev-docker-repo:third-tag
+    image: stianlaa/dev-docker-repo:volume-poc_${NU_VER}
     build:
       context: .
       dockerfile: volume-poc/Dockerfile
@@ -49,7 +49,7 @@ services:
 
   panic-poc:
     container_name: panic-poc
-    image: stianlaa/dev-docker-repo:fourth-tag
+    image: stianlaa/dev-docker-repo:panic-poc_${NU_VER}
     build:
       context: .
       dockerfile: panic-poc/Dockerfile
