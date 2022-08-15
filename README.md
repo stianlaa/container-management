@@ -78,7 +78,9 @@ It is possible to expose the docker daemon, but not recommended, and this would 
 ### Remaining to explore:
 - explore nginx setup with manager-web
 - explore placing manager-api inside a container
-- explore protecting them from being stopped
+- explore protecting some containers from being stopped from frontend
+- fix buttons on containerpage
+- implement argument editing, see how this persists across reboots
 - make example app which uses camera
 - make example app testing logging capability
 - make example apps which interact over network

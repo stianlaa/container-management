@@ -113,9 +113,8 @@
 
     <div class="container-info">
         <StatusTag containerName={containerName} containerInfo={containerInfo}/>
-
-        <p><b>Version: (To-be-decided how to store and fetch)</b> {containerInfo === null ? "unknown" : containerInfo.version}</p>
-        <p><b>Dependency:</b> {dockerComposeInfo?.services[containerName] === null ? "none" : dockerComposeInfo.services[containerName]?.depends_on}</p>
+        <p><b>Image:</b>{dockerComposeInfo?.services[containerName] === null ? "unknown" : dockerComposeInfo.services[containerName]?.image}</p>
+        <p><b>Dependency:</b>{dockerComposeInfo?.services[containerName] === null ? "none" : dockerComposeInfo.services[containerName]?.depends_on}</p>
         <p><b>Command-line:</b></p>
         <input bind:value={commandLineArgsInput} on:input={() => commandLineArgsButtonDisabled = false}/>
         <a class={`btn blue-grey ${commandLineArgsButtonDisabled ? "disabled" : ""}`}
