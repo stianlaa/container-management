@@ -3,13 +3,16 @@
         requestContainerInfo,
         requestContainerLogsLast,
         requestContainerLogsSpan,
+        tryActivateContainer,
+        tryDeactivateContainer
     } from "../../utils/api.ts";
     import {afterUpdate, onMount} from "svelte";
     import {onInterval} from "../../utils/onInterval.js";
+    import {isRunning} from "../../utils/container.js"
     import {composeInfoStore} from "./_store.js"
-    import {tryActivateContainer, tryDeactivateContainer} from "../../utils/api";
     import {formatDuration} from "../../utils/dateTimeUtils"
     import StatusTag from "../_components/StatusTag.svelte";
+    import {Circle} from "svelte-loading-spinners";
 
     export let containerName = null;
 
@@ -24,6 +27,7 @@
     let containerInfo = null;
     let commandLineArgsInput = null;
     let commandLineArgsButtonDisabled = true;
+    let requestInProgress = false;
 
     let dockerComposeInfo = null;
     composeInfoStore.subscribe(value => {
@@ -32,24 +36,40 @@
         }
     });
 
-    onMount(async () => {
-        containerInfo = await requestContainerInfo(containerName);
-        log.messages += await requestContainerLogsLast(containerInfo.id, 100);
-    });
+    onMount(updateInfo);
 
     onInterval(async () => await fetchLogs(), UPDATE_INTERVAL_MS);
+
+    async function updateInfo() {
+        containerInfo = await requestContainerInfo(containerName);
+        log.messages += await requestContainerLogsLast(containerInfo.id, 100);
+    }
+
+    async function onActivateContainerClick(containerInfo) {
+        requestInProgress = true;
+        await tryActivateContainer(containerInfo.id);
+        requestInProgress = false;
+        await updateInfo();
+    }
+
+    async function onDeactivateContainerClick(containerInfo) {
+        requestInProgress = true;
+        await tryDeactivateContainer(containerInfo.id);
+        requestInProgress = false;
+        await updateInfo();
+    }
 
     async function fetchLogs() {
         if (containerInfo !== null) {
             let now = Date.now();
-             let logResponse = await requestContainerLogsSpan(containerInfo.id, log.lastUpdatedTimestamp, now);
-             if (logResponse === null) {
-                 log.updateError = true;
-             } else {
-                 log.updateError = false;
-                 log.messages += logResponse;
-                 log.lastUpdatedTimestamp = now;
-             }
+            let logResponse = await requestContainerLogsSpan(containerInfo.id, log.lastUpdatedTimestamp, now);
+            if (logResponse === null) {
+                log.updateError = true;
+            } else {
+                log.updateError = false;
+                log.messages += logResponse;
+                log.lastUpdatedTimestamp = now;
+            }
         }
     }
 
@@ -112,9 +132,17 @@
     </div>
 
     <div class="container-info">
-        <StatusTag containerName={containerName} containerInfo={containerInfo}/>
-        <p><b>Image:</b>{dockerComposeInfo?.services[containerName] === null ? "unknown" : dockerComposeInfo.services[containerName]?.image}</p>
-        <p><b>Dependency:</b>{dockerComposeInfo?.services[containerName] === null ? "none" : dockerComposeInfo.services[containerName]?.depends_on}</p>
+                {#if requestInProgress}
+            <Circle size="50" color="#607d8b"/>
+        {:else}
+            <StatusTag containerName={containerName} containerInfo={containerInfo}/>
+        {/if}
+        <p>
+            <b>Image: </b>{dockerComposeInfo?.services[containerName] === null ? "unknown" : dockerComposeInfo.services[containerName]?.image}
+        </p>
+        <p>
+            <b>Dependency: </b>{dockerComposeInfo?.services[containerName] === null ? "none" : dockerComposeInfo.services[containerName]?.depends_on}
+        </p>
         <p><b>Command-line:</b></p>
         <input bind:value={commandLineArgsInput} on:input={() => commandLineArgsButtonDisabled = false}/>
         <a class={`btn blue-grey ${commandLineArgsButtonDisabled ? "disabled" : ""}`}
@@ -124,13 +152,21 @@
 
     <div class="button-row flex-container-horizontal">
         <div class="flex-item-grow"></div>
-        <button class={`flex-item-shrink btn blue-grey`}
-                on:click={tryDeactivateContainer(containerName)}>Deactivate
-        </button>
-        <button class={`flex-item-shrink btn blue-grey`}
-                on:click={tryActivateContainer(containerName)}>Activate
-        </button>
-        <button class="flex-item-shrink btn blue-grey" on:click={console.log("tryRestartContainer(containerName)")}>
+
+        {#if isRunning(containerName, containerInfo)}
+            <button class="entity-btn btn-large blue-grey" on:click={onDeactivateContainerClick(containerInfo)}>
+                <i class="material-icons left">{"remove_circle_outline"}</i>
+                Deactivate
+            </button>
+        {:else}
+            <button class="entity-btn btn-large green darken-1" on:click={onActivateContainerClick(containerInfo)}>
+                <i class="material-icons left">{"add_circle_outline"}</i>
+                Activate
+            </button>
+        {/if}
+
+        <button class="flex-item-shrink btn blue-grey"
+                on:click={console.log("TODO implement tryRestartContainer(containerName)")}>
             Restart
         </button>
     </div>

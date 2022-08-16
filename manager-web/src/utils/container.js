@@ -22,3 +22,7 @@ export function createContainerArgs(containerName, composeInfo) {
         container_name: containerName,
     };
 }
+
+export function isRunning(containerName, containerInfo) {
+    return getContainerState(containerName, containerInfo) === ContainerState.Running;
+}

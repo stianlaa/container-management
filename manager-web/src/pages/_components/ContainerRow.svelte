@@ -4,7 +4,7 @@
         tryActivateContainer,
         tryDeactivateContainer, tryCreateContainer,
     } from "../../utils/api";
-    import {ContainerState, createContainerArgs, getContainerState} from "../../utils/container";
+    import {ContainerState, createContainerArgs, getContainerState, isRunning} from "../../utils/container";
     import {Circle} from "svelte-loading-spinners";
     import StatusTag from "./StatusTag.svelte";
 
@@ -14,25 +14,22 @@
     export let updateInfo;
     let requestInProgress = false;
 
-    function isRunning(name, containerInfo) {
-        return getContainerState(name, containerInfo) === ContainerState.Running;
-    }
-
-    function onActivateContainerClick(name) {
+    async function onActivateContainerClick(name, containerInfo) {
         requestInProgress = true;
         if (getContainerState(name, containerInfo) === ContainerState.Down) {
-            tryCreateContainer(createContainerArgs(name, composeInfo))
-                .then(() => {requestInProgress = false; updateInfo()})
+            await tryCreateContainer(createContainerArgs(name, composeInfo));
         } else {
-            tryActivateContainer(containerInfo.id)
-                .then(() => {requestInProgress = false; updateInfo()})
+            await tryActivateContainer(containerInfo.id);
         }
+        requestInProgress = false;
+        updateInfo();
     }
 
-    function onDeactivateContainerClick(containerId) {
+    async function onDeactivateContainerClick(containerInfo) {
         requestInProgress = true;
-        tryDeactivateContainer(containerId)
-            .then(() => {requestInProgress = false; updateInfo()})
+        await tryDeactivateContainer(containerInfo.id);
+        requestInProgress = false;
+        updateInfo();
     }
 </script>
 
@@ -71,20 +68,20 @@
 
         {#if isRunning(name, containerInfo)}
             <button class="entity-btn btn-large blue-grey"
-                    on:click={onDeactivateContainerClick(containerInfo.id)}>
+                    on:click={onDeactivateContainerClick(containerInfo)}>
                 <i class="material-icons left">{"remove_circle_outline"}</i>
                 Deactivate
             </button>
         {:else}
             <button class="entity-btn btn-large green darken-1"
-                    on:click={onActivateContainerClick(name)}>
+                    on:click={onActivateContainerClick(name, containerInfo)}>
                 <i class="material-icons left">{"add_circle_outline"}</i>
                 {getContainerState(name, containerInfo) === ContainerState.Down ? "Create" : "Activate"}
             </button>
         {/if}
 
         <a href={$url("./:name", { name })}
-           disabled={!isRunning(name, containerInfo) || null}
+           disabled={getContainerState(name, containerInfo) === ContainerState.Down || null}
            class="entity-btn btn-large blue-grey">
             View
         </a>
