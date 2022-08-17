@@ -3,8 +3,9 @@
         requestContainerInfo,
         requestContainerLogsLast,
         requestContainerLogsSpan,
-        tryActivateContainer,
-        tryDeactivateContainer
+        tryStartContainer,
+        tryStopContainer,
+        tryRestartContainer,
     } from "../../utils/api.ts";
     import {afterUpdate, onMount} from "svelte";
     import {onInterval} from "../../utils/onInterval.js";
@@ -45,16 +46,23 @@
         log.messages += await requestContainerLogsLast(containerInfo.id, 100);
     }
 
-    async function onActivateContainerClick(containerInfo) {
+    async function onStartContainerClick(containerInfo) {
         requestInProgress = true;
-        await tryActivateContainer(containerInfo.id);
+        await tryStartContainer(containerInfo.id);
         requestInProgress = false;
         await updateInfo();
     }
 
-    async function onDeactivateContainerClick(containerInfo) {
+    async function onStopContainerClick(containerInfo) {
         requestInProgress = true;
-        await tryDeactivateContainer(containerInfo.id);
+        await tryStopContainer(containerInfo.id);
+        requestInProgress = false;
+        await updateInfo();
+    }
+
+    async function onRestartContainerClick(containerInfo) {
+        requestInProgress = true;
+        await tryRestartContainer(containerInfo.id);
         requestInProgress = false;
         await updateInfo();
     }
@@ -92,6 +100,10 @@
 
     .button-row > .btn {
         margin-left: 5px;
+    }
+
+    .entity-btn {
+        margin-left: 20px;
     }
 
     .log-info {
@@ -154,19 +166,21 @@
         <div class="flex-item-grow"></div>
 
         {#if isRunning(containerName, containerInfo)}
-            <button class="entity-btn btn-large blue-grey" on:click={onDeactivateContainerClick(containerInfo)}>
+            <button class="entity-btn btn-large blue-grey" disabled={requestInProgress}
+                    on:click={onStopContainerClick(containerInfo)}>
                 <i class="material-icons left">{"remove_circle_outline"}</i>
-                Deactivate
+                Stop
             </button>
         {:else}
-            <button class="entity-btn btn-large green darken-1" on:click={onActivateContainerClick(containerInfo)}>
+            <button class="entity-btn btn-large green darken-1" disabled={requestInProgress}
+                    on:click={onStartContainerClick(containerInfo)}>
                 <i class="material-icons left">{"add_circle_outline"}</i>
-                Activate
+                Start
             </button>
         {/if}
 
-        <button class="flex-item-shrink btn blue-grey"
-                on:click={console.log("TODO implement tryRestartContainer(containerName)")}>
+        <button class="entity-btn btn-large blue-grey" disabled={requestInProgress}
+                on:click={onRestartContainerClick(containerInfo)}>
             Restart
         </button>
     </div>

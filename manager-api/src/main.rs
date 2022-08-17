@@ -57,6 +57,11 @@ fn stop_container(data: Json<ContainerId>) -> WebResult<()> {
     container::stop(data.0)
 }
 
+#[rocket::put("/restart", format = "application/json", data = "<data>")]
+fn restart_container(data: Json<ContainerId>) -> WebResult<()> {
+    container::restart(data.0)
+}
+
 #[rocket::put("/create", format = "application/json", data = "<data>")]
 fn create_container(data: Json<CreateContainerArgs>) -> WebResult<CreateContainerResponse> {
     container::create(data.0)
@@ -105,6 +110,7 @@ async fn main() {
                 get_container_logs,
                 start_container,
                 stop_container,
+                restart_container,
                 create_container,
                 remove_container,
             ],

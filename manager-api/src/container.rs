@@ -257,6 +257,17 @@ pub fn stop(stop_args: ContainerId) -> WebResult<()> {
     }
 }
 
+pub fn restart(start_args: ContainerId) -> WebResult<()> {
+    let docker = Docker::connect_with_defaults().unwrap();
+    match docker.restart_container(&start_args.container_id, Duration::from_secs(1)) {
+        Ok(_) => WebResult::Ok(()),
+        Err(error) => WebResult::Err(WebError::new(
+            500,
+            format!("unable to restart container: {:?}", error),
+        )),
+    }
+}
+
 pub fn create(create_args: CreateContainerArgs) -> WebResult<CreateContainerResponse> {
     let docker = Docker::connect_with_defaults().unwrap();
     let mut create = ContainerCreateOptions::new(create_args.image_name.as_str());

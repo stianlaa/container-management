@@ -81,6 +81,8 @@ It is possible to expose the docker daemon, but not recommended, and this would 
 - explore protecting some containers from being stopped from frontend
 - fix buttons on containerpage
 - implement argument editing, see how this persists across reboots
+- Pull out activate inProgress to wrapper function, e.g modify argument object which has inProgress member
+- Consider adding ContainerIdentifier class, where containerName if needed can be translated to id etc
 - make example app which uses camera
 - make example app testing logging capability
 - make example apps which interact over network

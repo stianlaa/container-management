@@ -1,8 +1,8 @@
 <script>
     import {url} from '@roxi/routify'
     import {
-        tryActivateContainer,
-        tryDeactivateContainer, tryCreateContainer,
+        tryStartContainer,
+        tryStopContainer, tryCreateContainer,
     } from "../../utils/api";
     import {ContainerState, createContainerArgs, getContainerState, isRunning} from "../../utils/container";
     import {Circle} from "svelte-loading-spinners";
@@ -14,20 +14,20 @@
     export let updateInfo;
     let requestInProgress = false;
 
-    async function onActivateContainerClick(name, containerInfo) {
+    async function onStartContainerClick(name, containerInfo) {
         requestInProgress = true;
         if (getContainerState(name, containerInfo) === ContainerState.Down) {
             await tryCreateContainer(createContainerArgs(name, composeInfo));
         } else {
-            await tryActivateContainer(containerInfo.id);
+            await tryStartContainer(containerInfo.id);
         }
         requestInProgress = false;
         updateInfo();
     }
 
-    async function onDeactivateContainerClick(containerInfo) {
+    async function onStopContainerClick(containerInfo) {
         requestInProgress = true;
-        await tryDeactivateContainer(containerInfo.id);
+        await tryStopContainer(containerInfo.id);
         requestInProgress = false;
         updateInfo();
     }
@@ -67,16 +67,16 @@
         {/if}
 
         {#if isRunning(name, containerInfo)}
-            <button class="entity-btn btn-large blue-grey"
-                    on:click={onDeactivateContainerClick(containerInfo)}>
+            <button class="entity-btn btn-large blue-grey" disabled={requestInProgress}
+                    on:click={onStopContainerClick(containerInfo)}>
                 <i class="material-icons left">{"remove_circle_outline"}</i>
-                Deactivate
+                Stop
             </button>
         {:else}
-            <button class="entity-btn btn-large green darken-1"
-                    on:click={onActivateContainerClick(name, containerInfo)}>
+            <button class="entity-btn btn-large green darken-1" disabled={requestInProgress}
+                    on:click={onStartContainerClick(name, containerInfo)}>
                 <i class="material-icons left">{"add_circle_outline"}</i>
-                {getContainerState(name, containerInfo) === ContainerState.Down ? "Create" : "Activate"}
+                {getContainerState(name, containerInfo) === ContainerState.Down ? "Create" : "Start"}
             </button>
         {/if}
 

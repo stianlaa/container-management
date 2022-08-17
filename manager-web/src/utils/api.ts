@@ -24,7 +24,7 @@ export async function listContainers(): Promise<object> {
     return null;
 }
 
-export async function tryActivateContainer(containerId) {
+export async function tryStartContainer(containerId) {
     try {
         const response = await api.put("/container/start", {container_id: containerId});
         return response.data;
@@ -34,9 +34,19 @@ export async function tryActivateContainer(containerId) {
     return null;
 }
 
-export async function tryDeactivateContainer(containerId): Promise<boolean> {
+export async function tryStopContainer(containerId): Promise<boolean> {
     try {
         const response = await api.put("/container/stop", {container_id: containerId});
+        return response.data;
+    } catch (error) {
+        console.error(error)
+    }
+    return false;
+}
+
+export async function tryRestartContainer(containerId): Promise<boolean> {
+    try {
+        const response = await api.put("/container/restart", {container_id: containerId});
         return response.data;
     } catch (error) {
         console.error(error)
