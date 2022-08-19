@@ -76,12 +76,16 @@ It seems that docker daemon communications ideally over socket, and a webserver 
 It is possible to expose the docker daemon, but not recommended, and this would entail extra work in frontend: https://towardsaws.com/ec2-2-ways-to-expose-docker-daemon-to-the-internet-why-61e349f99744
 
 ### Remaining to explore:
+
+- implement argument editing, see how this persists across reboots, currently create container appears to need remove, which clears logs, might be okay? but sad side-effect of adapting
+seems somewhat difficult, should map out alternatives
+  - Recreate container with new entrypoint, name would be the same, but containerId would change, perhaps this means view should be available despite container not existing
+
+- Pull out activate inProgress to wrapper function, e.g modify argument object which has inProgress member
+- Current create setup doesn't use entrypoint from docker-compose, and probably lots of other things, should be fixed
 - explore nginx setup with manager-web
 - explore placing manager-api inside a container
 - explore protecting some containers from being stopped from frontend
-- fix buttons on containerpage
-- implement argument editing, see how this persists across reboots
-- Pull out activate inProgress to wrapper function, e.g modify argument object which has inProgress member
 - Consider adding ContainerIdentifier class, where containerName if needed can be translated to id etc
 - make example app which uses camera
 - make example app testing logging capability

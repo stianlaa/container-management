@@ -1,9 +1,8 @@
 extern crate dockworker;
 
-use crate::container::{
-    Container, ContainerId, ContainerInfo, CreateContainerArgs, CreateContainerResponse, Log,
-    LogFilter,
-};
+use crate::container::{Container, ContainerId, ContainerInfo};
+use crate::container_creation::{ContainerCreateOptions, CreateContainerResponse};
+use crate::container_logs::{Log, LogFilter};
 use crate::web_result::WebResult;
 use docker_compose_types::Compose;
 use dockworker::image::SummaryImage;
@@ -13,6 +12,8 @@ use std::collections::BTreeMap;
 
 mod compose;
 mod container;
+mod container_creation;
+mod container_logs;
 mod image;
 mod web_result;
 
@@ -42,7 +43,7 @@ fn get_container_logs(
     until: Option<i64>,
     tail: Option<i64>,
 ) -> WebResult<Log> {
-    container::get_container_logs(container_id, LogFilter { since, until, tail })
+    container_logs::get_container_logs(container_id, LogFilter { since, until, tail })
 }
 
 #[rocket::put("/start", format = "application/json", data = "<data>")]
@@ -63,8 +64,8 @@ fn restart_container(data: Json<ContainerId>) -> WebResult<()> {
 }
 
 #[rocket::put("/create", format = "application/json", data = "<data>")]
-fn create_container(data: Json<CreateContainerArgs>) -> WebResult<CreateContainerResponse> {
-    container::create(data.0)
+fn create_container(data: Json<ContainerCreateOptions>) -> WebResult<CreateContainerResponse> {
+    container_creation::create(data.0)
 }
 
 #[rocket::put("/remove", format = "application/json", data = "<data>")]
@@ -82,6 +83,11 @@ fn get_image_list() -> WebResult<Vec<SummaryImage>> {
 #[rocket::get("/docker-compose", format = "application/json")]
 fn get_docker_compose() -> WebResult<Compose> {
     compose::get_docker_compose()
+}
+
+#[rocket::get("/default_config?<container_name>", format = "application/json")]
+fn get_default_creation_options(container_name: String) -> WebResult<ContainerCreateOptions> {
+    compose::get_default_creation_options(container_name)
 }
 
 #[rocket::main]
@@ -116,7 +122,10 @@ async fn main() {
             ],
         )
         .mount("/image/", rocket::routes![get_image_list])
-        .mount("/compose/", rocket::routes![get_docker_compose])
+        .mount(
+            "/compose/",
+            rocket::routes![get_docker_compose, get_default_creation_options],
+        )
         .attach(cors)
         .launch()
         .await;

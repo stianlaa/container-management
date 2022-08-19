@@ -64,6 +64,20 @@ export async function tryCreateContainer(createContainerArgs) {
     return null;
 }
 
+export async function requestDefaultContainerOptions(name) {
+    try {
+        const response = await api.get("compose/default_config", {
+            params: {
+                container_name: name,
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error(error)
+    }
+    return null;
+}
+
 export async function requestContainerInfo(container_id): Promise<string> {
     try {
         const response = await api.get("/container/info/", {

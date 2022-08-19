@@ -16,13 +16,6 @@ export function getContainerState(containerName, containerInfo) {
     return containerInfo?.state;
 }
 
-export function createContainerArgs(containerName, composeInfo) {
-    return {
-        image_name: composeInfo.image,
-        container_name: containerName,
-    };
-}
-
 export function isRunning(containerName, containerInfo) {
     return getContainerState(containerName, containerInfo) === ContainerState.Running;
 }

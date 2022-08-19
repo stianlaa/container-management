@@ -1,6 +1,6 @@
 use crate::web_result::{WebError, WebResult};
 use dockworker::container::ContainerFilters;
-use dockworker::{ContainerCreateOptions, Docker};
+use dockworker::Docker;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::time::Duration;
@@ -28,18 +28,6 @@ impl From<String> for State {
             _ => State::Unknown,
         }
     }
-}
-
-#[derive(Debug, Deserialize)]
-pub struct CreateContainerArgs {
-    pub image_name: String,
-    pub container_name: String,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct CreateContainerResponse {
-    pub id: String,
-    pub warnings: Option<Vec<String>>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -124,36 +112,6 @@ impl From<dockworker::container::ContainerInfo> for ContainerInfo {
     }
 }
 
-#[derive(Debug, Deserialize)]
-pub struct LogFilter {
-    pub since: Option<i64>,
-    pub until: Option<i64>,
-    pub tail: Option<i64>,
-}
-
-#[derive(Debug, Serialize)]
-pub struct Log {
-    /// [(timestamp, message),...]
-    pub messages: Vec<(String, String)>,
-}
-
-impl From<Vec<String>> for Log {
-    fn from(output: Vec<String>) -> Self {
-        Log {
-            messages: output
-                .into_iter()
-                .map(|entry| {
-                    // TODO fragile and perhaps inefficient, improve
-                    let mut parts = entry.splitn(2, ' ').map(String::from);
-                    let timestamp = parts.next().unwrap();
-                    let message = parts.next().unwrap();
-                    (timestamp, message)
-                })
-                .collect(),
-        }
-    }
-}
-
 pub fn list() -> WebResult<BTreeMap<String, Container>> {
     let docker = Docker::connect_with_defaults().unwrap();
     let filter = ContainerFilters::new();
@@ -206,34 +164,6 @@ pub fn get_info(container_id: String) -> WebResult<ContainerInfo> {
     }
 }
 
-pub fn get_container_logs(container_id: String, log_filter: LogFilter) -> WebResult<Log> {
-    let docker = Docker::connect_with_defaults().unwrap();
-    let log_options = dockworker::ContainerLogOptions {
-        stdout: true,
-        stderr: true,
-        since: log_filter.since,
-        until: log_filter.until,
-        timestamps: Some(true),
-        tail: log_filter.tail,
-        follow: false,
-    };
-    match docker.log_container(container_id.as_str(), &log_options) {
-        Ok(mut log_response) => match log_response.output() {
-            Ok(output) => WebResult::Ok(Log::from(
-                output.lines().map(String::from).collect::<Vec<String>>(),
-            )),
-            Err(error) => WebResult::Err(WebError::new(
-                500,
-                format!("unable to get log output: {:?}", error),
-            )),
-        },
-        Err(error) => WebResult::Err(WebError::new(
-            500,
-            format!("unable to get container logs: {:?}", error),
-        )),
-    }
-}
-
 pub fn start(start_args: ContainerId) -> WebResult<()> {
     let docker = Docker::connect_with_defaults().unwrap();
     match docker.start_container(&start_args.container_id) {
@@ -264,23 +194,6 @@ pub fn restart(start_args: ContainerId) -> WebResult<()> {
         Err(error) => WebResult::Err(WebError::new(
             500,
             format!("unable to restart container: {:?}", error),
-        )),
-    }
-}
-
-pub fn create(create_args: CreateContainerArgs) -> WebResult<CreateContainerResponse> {
-    let docker = Docker::connect_with_defaults().unwrap();
-    let mut create = ContainerCreateOptions::new(create_args.image_name.as_str());
-    create.tty(true);
-
-    match docker.create_container(Some(create_args.container_name.as_str()), &create) {
-        Ok(creation_response) => WebResult::Ok(CreateContainerResponse {
-            id: creation_response.id,
-            warnings: creation_response.warnings,
-        }),
-        Err(error) => WebResult::Err(WebError::new(
-            500,
-            format!("unable to create container: {:?}", error),
         )),
     }
 }

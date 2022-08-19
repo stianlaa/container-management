@@ -23,6 +23,7 @@
 
     onInterval(async () => await updateInfo(), 5000);
 
+    // TODO consider removing compose from regular update and keep in onMount instead
     async function updateInfo() {
         let [composeInfo, containerList] = await Promise.all([requestDockerCompose(), listContainers()]);
         composeInfoStore.set(composeInfo);
@@ -45,7 +46,6 @@
     {#each Object.entries(dockerComposeInfo["services"]) as [containerName, composeInfo]}
         <ContainerRow
                 name={containerName}
-                composeInfo={composeInfo}
                 containerInfo={containerList[containerName]}
                 updateInfo={updateInfo}
         />

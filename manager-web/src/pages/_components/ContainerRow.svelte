@@ -1,15 +1,15 @@
 <script>
     import {url} from '@roxi/routify'
     import {
+        requestDefaultContainerOptions,
         tryStartContainer,
         tryStopContainer, tryCreateContainer,
-    } from "../../utils/api";
-    import {ContainerState, createContainerArgs, getContainerState, isRunning} from "../../utils/container";
+    } from "$utils/api";
+    import {ContainerState, getContainerState, isRunning} from "$utils/container";
     import {Circle} from "svelte-loading-spinners";
     import StatusTag from "./StatusTag.svelte";
 
     export let name;
-    export let composeInfo;
     export let containerInfo;
     export let updateInfo;
     let requestInProgress = false;
@@ -17,7 +17,8 @@
     async function onStartContainerClick(name, containerInfo) {
         requestInProgress = true;
         if (getContainerState(name, containerInfo) === ContainerState.Down) {
-            await tryCreateContainer(createContainerArgs(name, composeInfo));
+            let default_options = await requestDefaultContainerOptions(name);
+            await tryCreateContainer(default_options);
         } else {
             await tryStartContainer(containerInfo.id);
         }
