@@ -77,12 +77,8 @@ It is possible to expose the docker daemon, but not recommended, and this would 
 
 ### Remaining to explore:
 
-- implement argument editing, see how this persists across reboots, currently create container appears to need remove, which clears logs, might be okay? but sad side-effect of adapting
-seems somewhat difficult, should map out alternatives
-  - Recreate container with new entrypoint, name would be the same, but containerId would change, perhaps this means view should be available despite container not existing
-
 - Pull out activate inProgress to wrapper function, e.g modify argument object which has inProgress member
-- Current create setup doesn't use entrypoint from docker-compose, and probably lots of other things, should be fixed
+- multiple todos laying about should be fixed
 - explore nginx setup with manager-web
 - explore placing manager-api inside a container
 - explore protecting some containers from being stopped from frontend

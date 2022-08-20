@@ -13,18 +13,14 @@
     export let containerName = null;
     export let containerInfo = null;
     export let viewButton = true;
-    export let createContainerOptions = null;
     export let updateInfo = () => {};
     let requestInProgress = false;
 
     async function onStartContainerClick(containerName, containerInfo) {
         requestInProgress = true;
         if (getContainerState(containerName, containerInfo) === ContainerState.Down) {
-            let options = await requestDefaultContainerOptions(containerName);
-            if (createContainerOptions !== null) {
-                options["entrypoint"] = createContainerOptions;
-            }
-            await tryCreateContainer(options);
+            let default_options = await requestDefaultContainerOptions(containerName);
+            await tryCreateContainer(default_options);
         } else {
             await tryStartContainer(containerInfo.id);
         }
@@ -62,7 +58,7 @@
     }
 </style>
 
-<div class="page flex-container-vertical">
+<div class="flex-container-vertical">
     <div class="container-row flex-container-horizontal">
         <h5 class="row-name">
             {containerName}
@@ -83,7 +79,7 @@
             <button class="entity-btn btn-large green darken-1" disabled={requestInProgress}
                     on:click={onStartContainerClick(containerName, containerInfo)}>
                 <i class="material-icons left">{"add_circle_outline"}</i>
-                {getContainerState(containerName, containerInfo) === ContainerState.Down ? "Create" : "Start"}
+                {getContainerState(containerName, containerInfo) === ContainerState.Down ? "Create default" : "Start"}
             </button>
         {/if}
 
@@ -93,6 +89,5 @@
             View
         </a>
         {/if}
-        <br/>
     </div>
 </div>

@@ -44,6 +44,16 @@ export async function tryStopContainer(containerId): Promise<boolean> {
     return false;
 }
 
+export async function tryRemoveContainer(containerId): Promise<boolean> {
+    try {
+        const response = await api.put("/container/remove", {container_id: containerId});
+        return response.data;
+    } catch (error) {
+        console.error(error)
+    }
+    return false;
+}
+
 export async function tryRestartContainer(containerId): Promise<boolean> {
     try {
         const response = await api.put("/container/restart", {container_id: containerId});
