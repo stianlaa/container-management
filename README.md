@@ -76,13 +76,10 @@ It seems that docker daemon communications ideally over socket, and a webserver 
 It is possible to expose the docker daemon, but not recommended, and this would entail extra work in frontend: https://towardsaws.com/ec2-2-ways-to-expose-docker-daemon-to-the-internet-why-61e349f99744
 
 ### Remaining to explore:
-
-- Pull out activate inProgress to wrapper function, e.g modify argument object which has inProgress member
 - multiple todos laying about should be fixed
 - explore nginx setup with manager-web
 - explore placing manager-api inside a container
 - explore protecting some containers from being stopped from frontend
-- Consider adding ContainerIdentifier class, where containerName if needed can be translated to id etc
 - make example app which uses camera
 - make example app testing logging capability
 - make example apps which interact over network

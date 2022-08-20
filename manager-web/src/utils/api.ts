@@ -1,119 +1,70 @@
-import axios from "axios";
+import axios, {AxiosResponse} from "axios";
+
+function getHostname() {
+    if (import.meta.env.VITE_NUON_WEBAPI_HOST !== undefined) {
+        return import.meta.env.VITE_NUON_WEBAPI_HOST;
+    }
+    return window.location.hostname;
+}
+
+function getPort() {
+    if (import.meta.env.VITE_NUON_WEBAPI_PORT !== undefined) {
+        return import.meta.env.VITE_NUON_WEBAPI_PORT;
+    }
+    return "8000";
+}
 
 const api = axios.create({
-    baseURL: "http://localhost:8000",
+    baseURL: `${window.location.protocol}//${getHostname()}:${getPort()}`,
 });
 
-export async function requestDockerCompose(): Promise<object> {
+function unwrapResponse(response: AxiosResponse<any, any>) {
     try {
-        const response = await api.get("/compose/docker-compose");
         return response.data;
     } catch (error) {
         console.error(error);
     }
     return null;
+}
+
+export async function requestDockerCompose(): Promise<object> {
+    return unwrapResponse(await api.get("/compose/docker-compose"));
 }
 
 export async function listContainers(): Promise<object> {
-    try {
-        const response = await api.get("/container/list");
-        return response.data;
-    } catch (error) {
-        console.error(error);
-    }
-    return null;
+    return unwrapResponse(await api.get("/container/list"));
 }
 
-export async function tryStartContainer(containerId) {
-    try {
-        const response = await api.put("/container/start", {container_id: containerId});
-        return response.data;
-    } catch (error) {
-        console.error(error)
-    }
-    return null;
+export async function tryStartContainer(containerId: string) {
+    return unwrapResponse(await api.put("/container/start", {container_id: containerId}));
 }
 
-export async function tryStopContainer(containerId): Promise<boolean> {
-    try {
-        const response = await api.put("/container/stop", {container_id: containerId});
-        return response.data;
-    } catch (error) {
-        console.error(error)
-    }
-    return false;
+export async function tryStopContainer(containerId: string): Promise<boolean> {
+    return unwrapResponse(await api.put("/container/stop", {container_id: containerId}));
 }
 
-export async function tryRemoveContainer(containerId): Promise<boolean> {
-    try {
-        const response = await api.put("/container/remove", {container_id: containerId});
-        return response.data;
-    } catch (error) {
-        console.error(error)
-    }
-    return false;
+export async function tryRemoveContainer(containerId: string): Promise<boolean> {
+    return unwrapResponse(await api.put("/container/remove", {container_id: containerId}));
 }
 
-export async function tryRestartContainer(containerId): Promise<boolean> {
-    try {
-        const response = await api.put("/container/restart", {container_id: containerId});
-        return response.data;
-    } catch (error) {
-        console.error(error)
-    }
-    return false;
+export async function tryRestartContainer(containerId: string): Promise<boolean> {
+    return unwrapResponse(await api.put("/container/restart", {container_id: containerId}));
 }
 
 export async function tryCreateContainer(createContainerArgs) {
-    try {
-        const response = await api.put("/container/create", createContainerArgs);
-        return response.data;
-    } catch (error) {
-        console.error(error)
-    }
-    return null;
+    return unwrapResponse(await api.put("/container/create", createContainerArgs));
 }
 
-export async function requestDefaultContainerOptions(name) {
-    try {
-        const response = await api.get("compose/default_config", {
-            params: {
-                container_name: name,
-            }
-        });
-        return response.data;
-    } catch (error) {
-        console.error(error)
-    }
-    return null;
+export async function requestDefaultContainerOptions(containerName: string): Promise<boolean> {
+    return unwrapResponse(await api.get("compose/default_config", {params: {container_name: containerName}}));
 }
 
-export async function requestContainerInfo(container_id): Promise<string> {
-    try {
-        const response = await api.get("/container/info/", {
-            params: {
-                container_id: container_id,
-            }
-        });
-        return response.data;
-    } catch (error) {
-        console.error(error)
-    }
-    return null;
+export async function requestContainerInfo(containerId: string): Promise<string> {
+    return unwrapResponse(await api.get("container/info", {params: {container_id: containerId}}));
 }
 
-export async function requestContainerInfoByName(container_name): Promise<string> {
-    try {
-        const response = await api.get("/container/info_by_name/", {
-            params: {
-                container_name: container_name,
-            }
-        });
-        return response.data;
-    } catch (error) {
-        console.error(error)
-    }
-    return null;
+export async function requestContainerInfoByName(containerName): Promise<string> {
+    return unwrapResponse(await api.get("container/info_by_name", {params: {container_name: containerName}}));
 }
 
 async function requestContainerLogs(request): Promise<string> {
@@ -133,8 +84,8 @@ export async function requestContainerLogsSpan(container_id: string, since: numb
     let request = {
         params: {
             container_id: container_id,
-            since: Math.floor(since/1000),
-            until: Math.floor(until/1000),
+            since: Math.floor(since / 1000),
+            until: Math.floor(until / 1000),
         }
     };
     return await requestContainerLogs(request);
