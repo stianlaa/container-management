@@ -23,6 +23,7 @@ impl WebError {
         let reason = match code {
             400 => "Bad Request".to_string(),
             401 => "Unauthorized".to_string(),
+            404 => "Not found".to_string(),
             500 => "Internal server error".to_string(),
             _ => "Error".to_string(),
         };

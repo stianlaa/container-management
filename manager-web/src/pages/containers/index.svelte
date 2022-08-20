@@ -3,8 +3,8 @@
     import {
         requestDockerCompose,
         listContainers,
-    } from "../../utils/api";
-    import {onInterval} from "../../utils/onInterval";
+    } from "$utils/api";
+    import {onInterval} from "$utils/onInterval";
     import ContainerRow from "../_components/ContainerRow.svelte";
 
     let dockerComposeInfo = null;
@@ -14,6 +14,7 @@
         }
     });
 
+    // TODO note: containerList[containerName] is not the same as containerInfo, the two should be merged or separated clearly, so there is no confusion
     let containerList = null;
     containerListStore.subscribe(value => {
         if (value !== null) {
@@ -45,9 +46,10 @@
     {#if dockerComposeInfo && containerList}
     {#each Object.entries(dockerComposeInfo["services"]) as [containerName, composeInfo]}
         <ContainerRow
-                name={containerName}
+                containerName={containerName}
                 containerInfo={containerList[containerName]}
                 updateInfo={updateInfo}
+                viewButton={true}
         />
     {/each}
     {:else}

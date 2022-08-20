@@ -3,21 +3,23 @@
     import {
         requestDefaultContainerOptions,
         tryStartContainer,
-        tryStopContainer, tryCreateContainer,
+        tryStopContainer,
+        tryCreateContainer,
     } from "$utils/api";
     import {ContainerState, getContainerState, isRunning} from "$utils/container";
     import {Circle} from "svelte-loading-spinners";
     import StatusTag from "./StatusTag.svelte";
 
-    export let name;
+    export let containerName;
     export let containerInfo;
     export let updateInfo;
+    export let viewButton;
     let requestInProgress = false;
 
-    async function onStartContainerClick(name, containerInfo) {
+    async function onStartContainerClick(containerName, containerInfo) {
         requestInProgress = true;
-        if (getContainerState(name, containerInfo) === ContainerState.Down) {
-            let default_options = await requestDefaultContainerOptions(name);
+        if (getContainerState(containerName, containerInfo) === ContainerState.Down) {
+            let default_options = await requestDefaultContainerOptions(containerName);
             await tryCreateContainer(default_options);
         } else {
             await tryStartContainer(containerInfo.id);
@@ -59,15 +61,15 @@
 <div class="page flex-container-vertical">
     <div class="container-row flex-container-horizontal">
         <h5 class="row-name">
-            {name}
+            {containerName}
         </h5>
         {#if requestInProgress}
             <Circle size="50" color="#607d8b"/>
         {:else}
-            <StatusTag containerName={name} containerInfo={containerInfo}/>
+            <StatusTag containerName={containerName} containerInfo={containerInfo}/>
         {/if}
 
-        {#if isRunning(name, containerInfo)}
+        {#if isRunning(containerName, containerInfo)}
             <button class="entity-btn btn-large blue-grey" disabled={requestInProgress}
                     on:click={onStopContainerClick(containerInfo)}>
                 <i class="material-icons left">{"remove_circle_outline"}</i>
@@ -75,15 +77,18 @@
             </button>
         {:else}
             <button class="entity-btn btn-large green darken-1" disabled={requestInProgress}
-                    on:click={onStartContainerClick(name, containerInfo)}>
+                    on:click={onStartContainerClick(containerName, containerInfo)}>
                 <i class="material-icons left">{"add_circle_outline"}</i>
-                {getContainerState(name, containerInfo) === ContainerState.Down ? "Create" : "Start"}
+                {getContainerState(containerName, containerInfo) === ContainerState.Down ? "Create" : "Start"}
             </button>
         {/if}
 
-        <a href={$url("./:name", { name })} class="entity-btn btn-large blue-grey">
+
+        {#if viewButton}
+        <a href={$url("./:containerName", { containerName })} class="entity-btn btn-large blue-grey">
             View
         </a>
+        {/if}
         <br/>
     </div>
 </div>

@@ -92,6 +92,20 @@ export async function requestContainerInfo(container_id): Promise<string> {
     return null;
 }
 
+export async function requestContainerInfoByName(container_name): Promise<string> {
+    try {
+        const response = await api.get("/container/info_by_name/", {
+            params: {
+                container_name: container_name,
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error(error)
+    }
+    return null;
+}
+
 async function requestContainerLogs(request): Promise<string> {
     try {
         const response = await api.get("/container/logs", request);

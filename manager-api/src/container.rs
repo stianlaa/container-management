@@ -131,19 +131,19 @@ pub fn list() -> WebResult<BTreeMap<String, Container>> {
     }
 }
 
-pub fn get_info_by_name(container_name: String) -> WebResult<ContainerInfo> {
+pub fn get_info_by_name(container_name: String) -> WebResult<Option<ContainerInfo>> {
     let docker = Docker::connect_with_defaults().unwrap();
     match docker.list_containers(Some(true), None, None, ContainerFilters::new()) {
         Ok(container_list) => {
-            match container_list
-                .into_iter()
-                .find(|container| container.Names.contains(&container_name))
-            {
+            match container_list.into_iter().find(|container| {
+                container
+                    .Names
+                    .iter()
+                    .map(|name| name.replace('/', ""))
+                    .any(|name| name == container_name)
+            }) {
                 Some(container) => get_info(container.Id),
-                None => WebResult::Err(WebError::new(
-                    500,
-                    format!("unable to find container with name: {container_name:?}"),
-                )),
+                None => WebResult::Ok(None),
             }
         }
         Err(error) => WebResult::Err(WebError::new(
@@ -153,10 +153,10 @@ pub fn get_info_by_name(container_name: String) -> WebResult<ContainerInfo> {
     }
 }
 
-pub fn get_info(container_id: String) -> WebResult<ContainerInfo> {
+pub fn get_info(container_id: String) -> WebResult<Option<ContainerInfo>> {
     let docker = Docker::connect_with_defaults().unwrap();
     match docker.container_info(&container_id) {
-        Ok(container_info) => WebResult::Ok(container_info.into()),
+        Ok(container_info) => WebResult::Ok(Some(container_info.into())),
         Err(error) => WebResult::Err(WebError::new(
             500,
             format!("unable to get container info: {:?}", error),

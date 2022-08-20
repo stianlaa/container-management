@@ -24,12 +24,12 @@ fn get_container_list() -> WebResult<BTreeMap<String, Container>> {
 }
 
 #[rocket::get("/info?<container_id>", format = "application/json")]
-fn get_container_info(container_id: String) -> WebResult<ContainerInfo> {
+fn get_container_info(container_id: String) -> WebResult<Option<ContainerInfo>> {
     container::get_info(container_id)
 }
 
 #[rocket::get("/info_by_name?<container_name>", format = "application/json")]
-fn get_container_info_by_name(container_name: String) -> WebResult<ContainerInfo> {
+fn get_container_info_by_name(container_name: String) -> WebResult<Option<ContainerInfo>> {
     container::get_info_by_name(container_name)
 }
 
