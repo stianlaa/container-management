@@ -3,6 +3,7 @@
         requestContainerInfo,
         requestContainerLogsLast,
         requestContainerLogsSpan,
+        requestDefaultContainerOptions,
         tryStartContainer,
         tryStopContainer,
         tryRestartContainer,
@@ -15,6 +16,7 @@
     import StatusTag from "../_components/StatusTag.svelte";
     import {Circle} from "svelte-loading-spinners";
 
+    // TODO horrible semantics, need to be improved
     export let containerName = null;
 
     const UPDATE_INTERVAL_MS = 2000;
@@ -25,6 +27,7 @@
         autoScroll: true,
         updateError: false,
     };
+    let containerCreated = true;
     let containerInfo = null;
     let commandLineArgsInput = null;
     let commandLineArgsButtonDisabled = true;
@@ -37,13 +40,30 @@
         }
     });
 
-    onMount(updateInfo);
-
-    onInterval(async () => await fetchLogs(), UPDATE_INTERVAL_MS);
+    onMount(() => {
+        // TODO make update and requestDefaultContainerOptions parallel
+        updateInfo()
+            .then(() => {return requestDefaultContainerOptions(containerName)})
+            .then((defaultContainerOptions) => {
+                if (containerInfo == null) {
+                    commandLineArgsInput = defaultContainerOptions["entrypoint"];
+                } else {
+                    commandLineArgsInput = containerInfo["args"];
+                }
+            });
+    });
 
     async function updateInfo() {
-        containerInfo = await requestContainerInfo(containerName);
-        log.messages += await requestContainerLogsLast(containerInfo.id, 100);
+        if (containerCreated) {
+            let response = await requestContainerInfo(containerName);
+            if (response == null) {
+                containerCreated = false;
+                return;
+            } else {
+                containerInfo = response;
+            }
+            log.messages += await requestContainerLogsLast(containerInfo.id, 100);
+        }
     }
 
     async function onStartContainerClick(containerInfo) {
@@ -66,6 +86,13 @@
         requestInProgress = false;
         await updateInfo();
     }
+
+    async function modifyContainerCommandLineArgs(containerName, commandLineArgsInput) {
+        // TODO first, remove the existing container, if it exists
+        // TODO second, create new container, but with entrypoint overridden
+    }
+
+    onInterval(async () => await fetchLogs(), UPDATE_INTERVAL_MS);
 
     async function fetchLogs() {
         if (containerInfo !== null) {
@@ -144,7 +171,7 @@
     </div>
 
     <div class="container-info">
-                {#if requestInProgress}
+        {#if requestInProgress}
             <Circle size="50" color="#607d8b"/>
         {:else}
             <StatusTag containerName={containerName} containerInfo={containerInfo}/>
@@ -158,28 +185,27 @@
         <p><b>Command-line:</b></p>
         <input bind:value={commandLineArgsInput} on:input={() => commandLineArgsButtonDisabled = false}/>
         <a class={`btn blue-grey ${commandLineArgsButtonDisabled ? "disabled" : ""}`}
-           on:click={console.log("modifyContainerCommandLineArgs(containerName, commandLineArgsInput)")}>Save and
-            restart</a>
+           on:click={modifyContainerCommandLineArgs(containerName, commandLineArgsInput)}>Save and
+            recreate</a>
     </div>
 
     <div class="button-row flex-container-horizontal">
         <div class="flex-item-grow"></div>
-
         {#if isRunning(containerName, containerInfo)}
-            <button class="entity-btn btn-large blue-grey" disabled={requestInProgress}
+            <button class={`entity-btn btn-large blue-grey ${requestInProgress ? "disabled" : ""}`}
                     on:click={onStopContainerClick(containerInfo)}>
                 <i class="material-icons left">{"remove_circle_outline"}</i>
                 Stop
             </button>
         {:else}
-            <button class="entity-btn btn-large green darken-1" disabled={requestInProgress}
+            <button class={`entity-btn btn-large green darken-1 ${requestInProgress ? "disabled" : ""}`}
                     on:click={onStartContainerClick(containerInfo)}>
                 <i class="material-icons left">{"add_circle_outline"}</i>
                 Start
             </button>
         {/if}
 
-        <button class="entity-btn btn-large blue-grey" disabled={requestInProgress}
+        <button class={`entity-btn btn-large blue-grey ${requestInProgress ? "disabled" : ""}`}
                 on:click={onRestartContainerClick(containerInfo)}>
             Restart
         </button>

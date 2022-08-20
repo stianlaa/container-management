@@ -81,9 +81,7 @@
             </button>
         {/if}
 
-        <a href={$url("./:name", { name })}
-           disabled={getContainerState(name, containerInfo) === ContainerState.Down || null}
-           class="entity-btn btn-large blue-grey">
+        <a href={$url("./:name", { name })} class="entity-btn btn-large blue-grey">
             View
         </a>
         <br/>
