@@ -10,17 +10,21 @@
     import {Circle} from "svelte-loading-spinners";
     import StatusTag from "./StatusTag.svelte";
 
-    export let containerName;
-    export let containerInfo;
-    export let updateInfo;
-    export let viewButton;
+    export let containerName = null;
+    export let containerInfo = null;
+    export let viewButton = true;
+    export let createContainerOptions = null;
+    export let updateInfo = () => {};
     let requestInProgress = false;
 
     async function onStartContainerClick(containerName, containerInfo) {
         requestInProgress = true;
         if (getContainerState(containerName, containerInfo) === ContainerState.Down) {
-            let default_options = await requestDefaultContainerOptions(containerName);
-            await tryCreateContainer(default_options);
+            let options = await requestDefaultContainerOptions(containerName);
+            if (createContainerOptions !== null) {
+                options["entrypoint"] = createContainerOptions;
+            }
+            await tryCreateContainer(options);
         } else {
             await tryStartContainer(containerInfo.id);
         }

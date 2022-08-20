@@ -32,10 +32,10 @@
     async function initialUpdate() {
         let [containerInfoResponse, defaultContainerOptions] = await Promise.all([requestContainerInfoByName(containerName), requestDefaultContainerOptions(containerName)]);
         if (getContainerState(containerName, containerInfoResponse) === ContainerState.Down) {
-            commandLineArgsInput = defaultContainerOptions["entrypoint"];
+            commandLineArgsInput = defaultContainerOptions["entrypoint"].join(", ");
         } else {
             containerInfo = containerInfoResponse;
-            commandLineArgsInput = containerInfo["args"];
+            commandLineArgsInput = [`${containerName}`, ...containerInfoResponse["args"]].join(", ");
         }
     }
 
@@ -46,6 +46,10 @@
     async function modifyContainerCommandLineArgs(containerName, commandLineArgsInput) {
         // TODO first, remove the existing container, if it exists
         // TODO second, create new container, but with entrypoint overridden
+    }
+
+    function parseArgString(argString) {
+        return argString?.split(",")?.map((arg) => arg.trim());
     }
 </script>
 
@@ -68,6 +72,7 @@
             containerInfo={containerInfo}
             updateInfo={updateInfo}
             viewButton={false}
+            createContainerOptions={parseArgString(commandLineArgsInput)}
     />
 
     <div class="container-info">
@@ -80,8 +85,9 @@
         <p><b>Command-line:</b></p>
         <input bind:value={commandLineArgsInput} on:input={() => commandLineArgsButtonDisabled = false}/>
         <a class={`btn blue-grey ${commandLineArgsButtonDisabled ? "disabled" : ""}`}
-           on:click={modifyContainerCommandLineArgs(containerName, commandLineArgsInput)}>Save and
-            recreate</a>
+           on:click={modifyContainerCommandLineArgs(containerName, parseArgString(commandLineArgsInput))}>
+            Save and recreate
+        </a>
     </div>
 
     <ContainerLog

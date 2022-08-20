@@ -49,7 +49,6 @@
                 containerName={containerName}
                 containerInfo={containerList[containerName]}
                 updateInfo={updateInfo}
-                viewButton={true}
         />
     {/each}
     {:else}
