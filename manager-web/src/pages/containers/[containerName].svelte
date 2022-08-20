@@ -10,7 +10,7 @@
     import ContainerRow from "../_components/ContainerRow.svelte";
     import ContainerLog from "../_components/ContainerLog.svelte";
 
-    const UPDATE_INTERVAL_MS = 2000;
+    const UPDATE_INTERVAL_MS = 5000;
 
     export let containerName = null;
 
@@ -27,7 +27,7 @@
 
     onMount(initialUpdate);
 
-    // onInterval(updateInfo, UPDATE_INTERVAL_MS);
+    onInterval(updateInfo, UPDATE_INTERVAL_MS);
 
     async function initialUpdate() {
         let [containerInfoResponse, defaultContainerOptions] = await Promise.all([requestContainerInfoByName(containerName), requestDefaultContainerOptions(containerName)]);
@@ -84,8 +84,8 @@
             recreate</a>
     </div>
 
-    <ContainerLog>
-        containerName={containerName}
-        containerInfo={containerInfo}
-    </ContainerLog>
+    <ContainerLog
+            containerId={containerInfo?.id}
+            containerState={containerInfo?.state}
+    />
 </div>

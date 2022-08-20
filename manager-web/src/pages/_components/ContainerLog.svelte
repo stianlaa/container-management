@@ -6,12 +6,12 @@
     import {afterUpdate, onMount} from "svelte";
     import {onInterval} from "../../utils/onInterval.js";
     import {formatDuration} from "../../utils/dateTimeUtils"
-    import {ContainerState, getContainerState} from "../../utils/container.js"
+    import {ContainerState} from "../../utils/container.js"
 
     const UPDATE_INTERVAL_MS = 2000;
 
-    export let containerName = null;
-    export let containerInfo = null;
+    export let containerId = null;
+    export let containerState = null;
 
     let log = {
         messages: "",
@@ -25,15 +25,15 @@
     onInterval(async () => await fetchLogs(), UPDATE_INTERVAL_MS);
 
     async function initialLogFetch() {
-        if (getContainerState(containerName, containerInfo) == ContainerState.Running) {
-            log.messages += await requestContainerLogsLast(containerInfo.id, 100);
+        if (containerState == ContainerState.Running) {
+            log.messages += await requestContainerLogsLast(containerId, 100);
         }
     }
 
     async function fetchLogs() {
-        if (containerInfo !== null) {
+        if (containerId !== null) {
             let now = Date.now();
-            let logResponse = await requestContainerLogsSpan(containerInfo.id, log.lastUpdatedTimestamp, now);
+            let logResponse = await requestContainerLogsSpan(containerId, log.lastUpdatedTimestamp, now);
             if (logResponse === null) {
                 log.updateError = true;
             } else {
