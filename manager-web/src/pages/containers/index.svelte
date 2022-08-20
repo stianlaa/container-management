@@ -4,6 +4,7 @@
         requestDockerCompose,
         listContainers,
     } from "$utils/api";
+    import {onMount} from "svelte";
     import {onInterval} from "$utils/onInterval";
     import ContainerRow from "../_components/ContainerRow.svelte";
 
@@ -24,10 +25,13 @@
 
     onInterval(async () => await updateInfo(), 5000);
 
-    // TODO consider removing compose from regular update and keep in onMount instead
-    async function updateInfo() {
-        let [composeInfo, containerList] = await Promise.all([requestDockerCompose(), listContainers()]);
+    onMount(async () => {
+        let composeInfo = await requestDockerCompose();
         composeInfoStore.set(composeInfo);
+    })
+
+    async function updateInfo() {
+        let containerList = await listContainers();
         containerListStore.set(containerList);
     }
 </script>
