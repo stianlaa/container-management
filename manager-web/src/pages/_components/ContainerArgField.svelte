@@ -52,10 +52,6 @@
         justify-content: center;
     }
 
-    .button-row > .btn {
-        margin-left: 5px;
-    }
-
     .btn {
         width: 25%;
     }

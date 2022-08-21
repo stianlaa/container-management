@@ -78,9 +78,7 @@ It is possible to expose the docker daemon, but not recommended, and this would 
 ### Remaining to explore:
 - implement inProgress functionality, or something reflecting promise state
 - multiple todos laying about should be fixed
-- explore nginx setup with manager-web
-- explore placing manager-api inside a container
-- explore protecting some containers from being stopped from frontend
+- consider protecting some containers from being stopped from frontend
 - make example app which uses camera
 - make example app testing logging capability
 - make example apps which interact over network
