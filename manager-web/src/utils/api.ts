@@ -1,14 +1,19 @@
+// @ts-ignore
 import axios, {AxiosResponse} from "axios";
 
 function getHostname() {
+    // @ts-ignore
     if (import.meta.env.VITE_NUON_WEBAPI_HOST !== undefined) {
+        // @ts-ignore
         return import.meta.env.VITE_NUON_WEBAPI_HOST;
     }
     return window.location.hostname;
 }
 
 function getPort() {
+    // @ts-ignore
     if (import.meta.env.VITE_NUON_WEBAPI_PORT !== undefined) {
+        // @ts-ignore
         return import.meta.env.VITE_NUON_WEBAPI_PORT;
     }
     return "8000";

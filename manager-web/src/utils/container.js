@@ -6,7 +6,7 @@ export const ContainerState = {
     Paused: "Paused", // A running container that is paused
     Dead: "Dead",
     Unknown: "Unknown",
-    Down: "Down", // An entry exists docker-compose, but no container exists
+    Down: "Down", // An entry exists in compose.yml, but no container exists
 }
 
 export function getContainerState(containerName, containerInfo) {

@@ -1,18 +1,17 @@
 version: "3.9"
 
 services:
-  # Currently manager-api doesn't function properly within a container, but it should be possible:
-  # https://stackoverflow.com/questions/36185035/how-to-mount-docker-socket-as-volume-in-docker-container-with-correct-group
-  # Another question is should the manager-api itself be within a container? This might cause chicken-and-egg issues
-  # manager-api:
-  #   container_name: manager-api-container
-  #   image: stianlaa/dev-docker-repo:manager-tag
-  #   build:
-  #     context: .
-  #     dockerfile: managnetworker-api/Dockerfile
-  #   entrypoint: [ "./run-service" ]
-  #   ports:
-  #     - "8000:8000"
+  manager-api:
+     container_name: manager-api-container
+     image: stianlaa/dev-docker-repo:manager-api_${NU_VER}
+     build:
+       context: .
+       dockerfile: manager-api/Dockerfile
+     entrypoint: [ "./run-service" ]
+     environment:
+       - NU_VER=image_v0.0.5
+     ports:
+       - "8000:8000"
 
   arg-poc:
     container_name: arg-poc

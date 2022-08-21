@@ -76,6 +76,7 @@ It seems that docker daemon communications ideally over socket, and a webserver 
 It is possible to expose the docker daemon, but not recommended, and this would entail extra work in frontend: https://towardsaws.com/ec2-2-ways-to-expose-docker-daemon-to-the-internet-why-61e349f99744
 
 ### Remaining to explore:
+- implement inProgress functionality, or something reflecting promise state
 - multiple todos laying about should be fixed
 - explore nginx setup with manager-web
 - explore placing manager-api inside a container

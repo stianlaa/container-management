@@ -5,8 +5,10 @@ use indexmap::IndexMap;
 use serde_yaml::Error;
 
 pub fn read_compose() -> Result<Compose, Error> {
-    // TODO: should be replaced with docker-compose file path
-    let file_payload = std::fs::read_to_string("../docker-compose.yml").unwrap();
+    let compose_path =
+        std::env::var("COMPOSE_PATH").unwrap_or_else(|_| String::from("../compose.yml"));
+    let file_payload = std::fs::read_to_string(compose_path.clone())
+        .unwrap_or_else(|_| panic!("compose file expected at {compose_path}"));
     let nu_ver = std::env::var("NU_VER").expect("NU_VER env var is required");
     let file_payload = file_payload.replace("${NU_VER}", nu_ver.as_str());
     serde_yaml::from_str::<Compose>(&file_payload)
@@ -82,11 +84,11 @@ pub fn get_default_creation_options(container_name: String) -> WebResult<Contain
                     }
                 }
             }
-            None => WebResult::Err(WebError::new(500, String::from("missing services"))),
+            None => WebResult::Err(WebError::new(500, String::from("missing services field"))),
         },
         Err(error) => WebResult::Err(WebError::new(
             500,
-            format!("unable read docker-compose file: {:?}", error),
+            format!("unable read compose file: {:?}", error),
         )),
     }
 }
