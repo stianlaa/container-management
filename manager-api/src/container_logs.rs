@@ -5,7 +5,6 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Deserialize)]
 pub struct LogFilter {
     pub since: Option<i64>,
-    pub until: Option<i64>,
     pub tail: Option<i64>,
 }
 
@@ -38,7 +37,6 @@ pub fn get_container_logs(container_id: String, log_filter: LogFilter) -> WebRes
         stdout: true,
         stderr: true,
         since: log_filter.since,
-        until: log_filter.until,
         timestamps: Some(true),
         tail: log_filter.tail,
         follow: false,

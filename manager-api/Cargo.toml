@@ -7,10 +7,7 @@ edition = "2021"
 rocket = {version="0.5.0-rc.2", features = ["json"]}
 # temporary reversion crate, due to build error https://github.com/lawliet89/rocket_cors/issues/111
 rocket_cors = { git = "https://github.com/lawliet89/rocket_cors.git", rev = "54fae070"  }
-# TODO fix
-# dockworker 0.0.23 works, but 0.0.24 does not, with the error message upon dockerworker instance making a request to the docker daemon
-# message: "rocket Cannot start a runtime from within a runtime" ..
-dockworker = { git = "https://github.com/stianlaa/dockworker.git", branch = "container-logs-until" }
+dockworker = "0.0.23" # Note, 0.0.24 results in this issue: https://github.com/tokio-rs/tokio/issues/2194
 serde = "1.0.140"
 serde_json = "1.0.81"
 serde_yaml = "0.9.4"

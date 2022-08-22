@@ -33,17 +33,13 @@ fn get_container_info_by_name(container_name: String) -> WebResult<Option<Contai
     container::get_info_by_name(container_name)
 }
 
-#[rocket::get(
-    "/logs?<container_id>&<since>&<until>&<tail>",
-    format = "application/json"
-)]
+#[rocket::get("/logs?<container_id>&<since>&<tail>", format = "application/json")]
 fn get_container_logs(
     container_id: String,
     since: Option<i64>,
-    until: Option<i64>,
     tail: Option<i64>,
 ) -> WebResult<Log> {
-    container_logs::get_container_logs(container_id, LogFilter { since, until, tail })
+    container_logs::get_container_logs(container_id, LogFilter { since, tail })
 }
 
 #[rocket::put("/start", format = "application/json", data = "<data>")]
