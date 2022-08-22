@@ -2,7 +2,7 @@ use crate::web_result::{WebError, WebResult};
 use dockworker::container::ContainerFilters;
 use dockworker::Docker;
 use serde::{Deserialize, Serialize};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
 use std::time::Duration;
 
 const STOP_CONTAINER_TIMEOUT_MS: u64 = 1000;
@@ -64,10 +64,57 @@ impl From<dockworker::container::Container> for Container {
 }
 
 #[derive(Debug, Serialize)]
+pub struct ContainerConfig {
+    pub attach_stderr: bool,
+    pub attach_stdin: bool,
+    pub attach_stdout: bool,
+    pub cmd: Vec<String>,
+    pub domainname: String,
+    pub entrypoint: Vec<String>,
+    pub env: Vec<String>,
+    pub exposed_ports: HashMap<String, HashMap<String, String>>,
+    pub hostname: String,
+    pub image: String,
+    pub labels: HashMap<String, String>,
+    pub on_build: Vec<String>,
+    pub open_stdin: bool,
+    pub stdin_once: bool,
+    pub tty: bool,
+    pub user: String,
+    pub volumes: HashMap<String, HashMap<String, String>>,
+    pub working_dir: String,
+}
+
+impl From<dockworker::container::Config> for ContainerConfig {
+    fn from(config: dockworker::container::Config) -> Self {
+        ContainerConfig {
+            attach_stderr: config.AttachStderr,
+            attach_stdin: config.AttachStdin,
+            attach_stdout: config.AttachStdout,
+            cmd: config.Cmd,
+            domainname: config.Domainname,
+            entrypoint: config.Entrypoint,
+            env: config.Env,
+            exposed_ports: config.ExposedPorts,
+            hostname: config.Hostname,
+            image: config.Image,
+            labels: config.Labels,
+            on_build: config.OnBuild,
+            open_stdin: config.OpenStdin,
+            stdin_once: config.StdinOnce,
+            tty: config.Tty,
+            user: config.User,
+            volumes: config.Volumes,
+            working_dir: config.WorkingDir,
+        }
+    }
+}
+
+#[derive(Debug, Serialize)]
 pub struct ContainerInfo {
     pub app_armor_profile: String,
     pub args: Vec<String>,
-    //pub config: Config, // TODO add or remove
+    pub config: ContainerConfig,
     pub created: String,
     pub driver: String,
     pub hostname_path: String,
@@ -91,7 +138,7 @@ impl From<dockworker::container::ContainerInfo> for ContainerInfo {
         ContainerInfo {
             app_armor_profile: container.AppArmorProfile,
             args: container.Args,
-            // config: container.Config,
+            config: container.Config.into(),
             created: container.Created,
             driver: container.Driver,
             hostname_path: container.HostnamePath,

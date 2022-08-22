@@ -77,6 +77,7 @@ It is possible to expose the docker daemon, but not recommended, and this would 
 
 ### Remaining to explore:
 - multiple todos laying about should be fixed
+- make api casing consistent
 - consider protecting some containers from being stopped from frontend
 - make example app which uses camera
 - make example app testing logging capability
