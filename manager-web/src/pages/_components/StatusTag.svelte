@@ -1,5 +1,5 @@
 <script>
-    import {ContainerState, getContainerState} from "../../utils/container";
+    import {ContainerState, getContainerState} from "$utils/container";
 
     export let containerName;
     export let containerInfo;

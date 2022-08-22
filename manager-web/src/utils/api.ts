@@ -2,18 +2,14 @@
 import axios, {AxiosResponse} from "axios";
 
 function getHostname() {
-    // @ts-ignore
     if (import.meta.env.VITE_NUON_WEBAPI_HOST !== undefined) {
-        // @ts-ignore
         return import.meta.env.VITE_NUON_WEBAPI_HOST;
     }
     return window.location.hostname;
 }
 
 function getPort() {
-    // @ts-ignore
     if (import.meta.env.VITE_NUON_WEBAPI_PORT !== undefined) {
-        // @ts-ignore
         return import.meta.env.VITE_NUON_WEBAPI_PORT;
     }
     return "8000";
@@ -40,7 +36,7 @@ export async function listContainers(): Promise<object> {
     return unwrapResponse(await api.get("/container/list"));
 }
 
-export async function tryStartContainer(containerId: string) {
+export async function tryStartContainer(containerId: string): Promise<object> {
     return unwrapResponse(await api.put("/container/start", {container_id: containerId}));
 }
 
@@ -56,7 +52,7 @@ export async function tryRestartContainer(containerId: string): Promise<boolean>
     return unwrapResponse(await api.put("/container/restart", {container_id: containerId}));
 }
 
-export async function tryCreateContainer(createContainerArgs) {
+export async function tryCreateContainer(createContainerArgs): Promise<object> {
     return unwrapResponse(await api.put("/container/create", createContainerArgs));
 }
 
@@ -97,7 +93,7 @@ export async function requestContainerLogsSpan(container_id: string, since: numb
 }
 
 
-export async function requestContainerLogsLast(container_id: string, count: Number) {
+export async function requestContainerLogsLast(container_id: string, count: Number): Promise<string> {
     let request = {
         params: {
             container_id: container_id,
