@@ -3,6 +3,7 @@ use crate::{ContainerCreateOptions, WebResult};
 use docker_compose_types::{Command, Compose, Entrypoint, Environment, Service};
 use indexmap::IndexMap;
 use serde_yaml::Error;
+use std::collections::HashMap;
 
 pub fn read_compose() -> Result<Compose, Error> {
     let compose_path =
@@ -27,7 +28,6 @@ pub fn get_docker_compose() -> WebResult<Compose> {
 
 pub fn get_default_creation_options(container_name: String) -> WebResult<ContainerCreateOptions> {
     match read_compose() {
-        // TODO Simplify
         Ok(compose) => match &compose.services {
             Some(services) => {
                 let index_map: IndexMap<String, Option<Service>> = services.0.clone();
@@ -52,7 +52,10 @@ pub fn get_default_creation_options(container_name: String) -> WebResult<Contain
                                 .unwrap_or_else(|| Environment::List(vec![String::default()]))
                             {
                                 Environment::List(elements) => elements,
-                                Environment::KvPair(_) => vec![], // TODO implement
+                                Environment::KvPair(m) => m
+                                    .into_iter()
+                                    .map(|(key, value)| format!("{} {:#?}", key, value))
+                                    .collect::<Vec<String>>(),
                             },
                             cmd: match service
                                 .command
@@ -69,8 +72,15 @@ pub fn get_default_creation_options(container_name: String) -> WebResult<Contain
                                 Entrypoint::Simple(entrypoint) => vec![entrypoint],
                             },
                             image: service.image.unwrap_or_default(),
-                            labels: Default::default(), // TODO implement
-                            working_dir: Default::default(), // TODO implement
+                            labels: match service.labels {
+                                Some(labels) => labels
+                                    .0
+                                    .into_iter()
+                                    .map(|(key, value)| (key, value))
+                                    .collect::<HashMap<String, String>>(),
+                                None => HashMap::new(),
+                            },
+                            working_dir: service.working_dir.unwrap_or_default().into(),
                             network_disabled: false,
                             mac_address: String::default(),
                             on_build: vec![],

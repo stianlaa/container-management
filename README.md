@@ -76,8 +76,8 @@ It seems that docker daemon communications ideally over socket, and a webserver 
 It is possible to expose the docker daemon, but not recommended, and this would entail extra work in frontend: https://towardsaws.com/ec2-2-ways-to-expose-docker-daemon-to-the-internet-why-61e349f99744
 
 ### Remaining to explore:
-- multiple todos laying about should be fixed
 - make api casing consistent
+- fix refreshing on containerpage
 - consider protecting some containers from being stopped from frontend
 - make example app which uses camera
 - make example app testing logging capability

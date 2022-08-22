@@ -210,7 +210,6 @@ pub fn start(start_args: ContainerId) -> WebResult<()> {
 
 pub fn stop(stop_args: ContainerId) -> WebResult<()> {
     let docker = Docker::connect_with_defaults().unwrap();
-    // TODO receive and deserialize duration from request
     match docker.stop_container(
         stop_args.container_id.as_str(),
         Duration::from_millis(STOP_CONTAINER_TIMEOUT_MS),
