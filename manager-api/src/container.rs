@@ -39,31 +39,6 @@ pub struct ContainerId {
 }
 
 #[derive(Debug, Serialize)]
-pub struct Container {
-    pub id: String,
-    pub image: String,
-    pub command: String,
-    pub status: Status,
-    pub name: String,
-}
-
-impl From<dockworker::container::Container> for Container {
-    fn from(container: dockworker::container::Container) -> Self {
-        Container {
-            id: container.Id,
-            image: container.Image,
-            command: container.Command,
-            status: container.State.into(),
-            name: container
-                .Names
-                .get(0)
-                .expect("containers should have at least one name")
-                .replace('/', ""),
-        }
-    }
-}
-
-#[derive(Debug, Serialize)]
 pub struct ContainerConfig {
     pub attach_stderr: bool,
     pub attach_stdin: bool,
@@ -159,17 +134,28 @@ impl From<dockworker::container::ContainerInfo> for ContainerInfo {
     }
 }
 
-pub fn list() -> WebResult<BTreeMap<String, Container>> {
+pub fn list() -> WebResult<BTreeMap<String, Option<ContainerInfo>>> {
     let docker = Docker::connect_with_defaults().unwrap();
     let filter = ContainerFilters::new();
     match docker.list_containers(Some(true), None, None, filter) {
-        Ok(container_list) => {
-            let mapped_containers: BTreeMap<String, Container> = container_list
+        Ok(containers) => {
+            let container_info = containers
                 .into_iter()
-                .map(Container::from)
-                .map(|container| (container.name.clone(), container))
-                .collect();
-            WebResult::Ok(mapped_containers)
+                .map(|container| {
+                    let container_info_opt = match docker.container_info(&container.Id) {
+                        Ok(info) => Some(ContainerInfo::from(info)),
+                        Err(_) => None,
+                    };
+                    let name = container
+                        .Names
+                        .get(0)
+                        .expect("containers should have at least one name")
+                        .replace('/', "");
+                    (name, container_info_opt)
+                })
+                .collect::<BTreeMap<String, Option<ContainerInfo>>>();
+
+            WebResult::Ok(container_info)
         }
         Err(error) => WebResult::Err(WebError::new(
             500,

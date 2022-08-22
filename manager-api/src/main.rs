@@ -1,6 +1,6 @@
 extern crate dockworker;
 
-use crate::container::{Container, ContainerId, ContainerInfo};
+use crate::container::{ContainerId, ContainerInfo};
 use crate::container_creation::{ContainerCreateOptions, CreateContainerResponse};
 use crate::container_logs::{Log, LogFilter};
 use crate::web_result::WebResult;
@@ -19,7 +19,7 @@ mod web_result;
 
 //container
 #[rocket::get("/list", format = "application/json")]
-fn get_container_list() -> WebResult<BTreeMap<String, Container>> {
+fn get_container_list() -> WebResult<BTreeMap<String, Option<ContainerInfo>>> {
     container::list()
 }
 
