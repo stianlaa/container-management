@@ -15,7 +15,6 @@
         }
     });
 
-    // TODO note: containerList[containerName] is not the same as containerInfo, the two should be merged or separated clearly, so there is no confusion
     let containerList = null;
     containerListStore.subscribe(value => {
         if (value !== null) {

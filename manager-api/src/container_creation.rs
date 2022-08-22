@@ -45,7 +45,7 @@ pub struct ContainerCreateOptions {
 
 impl From<ContainerCreateOptions> for dockworker::ContainerCreateOptions {
     fn from(options: ContainerCreateOptions) -> Self {
-        dockworker::ContainerCreateOptions::new(options.image.as_str())
+        let mut creation_opt = dockworker::ContainerCreateOptions::new(options.image.as_str())
             .hostname(options.hostname)
             .domainname(options.domainname)
             .user(options.user)
@@ -55,17 +55,24 @@ impl From<ContainerCreateOptions> for dockworker::ContainerCreateOptions {
             .tty(options.tty)
             .open_stdin(options.open_stdin)
             .stdin_once(options.stdin_once)
-            // .env(options.env) // TODO implement this, need to iterate
-            // .cmd(options.cmd)
             .entrypoint(options.entrypoint)
-            //.label(options.labels)
             .working_dir(options.working_dir)
             .network_disabled(options.network_disabled)
             .mac_address(options.mac_address)
             .on_build(options.on_build)
             .stop_signal(options.stop_signal)
             .stop_timeout(options.stop_timeout)
-            .clone()
+            .clone();
+        options.env.into_iter().for_each(|s| {
+            creation_opt.env(s);
+        });
+        options.cmd.into_iter().for_each(|s| {
+            creation_opt.cmd(s);
+        });
+        options.labels.into_iter().for_each(|(s, t)| {
+            creation_opt.label(s, t);
+        });
+        creation_opt
     }
 }
 
