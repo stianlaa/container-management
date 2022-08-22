@@ -2,7 +2,7 @@
     import {requestContainerInfoByName} from "../../utils/api.ts";
     import {onMount} from "svelte";
     import {onInterval} from "../../utils/onInterval.js";
-    import {getContainerState, ContainerState} from "../../utils/container.js"
+    import {getContainerStatus, ContainerStatus} from "../../utils/container.js"
     import {composeInfoStore} from "./_store.js"
     import ContainerRow from "../_components/ContainerRow.svelte";
     import ContainerLog from "../_components/ContainerLog.svelte";
@@ -27,7 +27,7 @@
 
     async function initialUpdate() {
         let containerInfoResponse = await requestContainerInfoByName(containerName);
-        if (getContainerState(containerName, containerInfoResponse) !== ContainerState.Down) {
+        if (getContainerStatus(containerName, containerInfoResponse) !== ContainerStatus.Down) {
             containerInfo = containerInfoResponse;
         }
     }
@@ -68,6 +68,6 @@
 
     <ContainerLog
             containerId={containerInfo?.id}
-            containerState={containerInfo?.state}
+            containerStatus={containerInfo?.status}
     />
 </div>

@@ -1,4 +1,4 @@
-export const ContainerState = {
+export const ContainerStatus = {
     Created: "Created",
     Running: "Running",
     Restarting: "Restarting", // A running container that is in the process of restarting
@@ -9,13 +9,13 @@ export const ContainerState = {
     Down: "Down", // An entry exists in compose.yml, but no container exists
 }
 
-export function getContainerState(containerName, containerInfo) {
-    if (containerInfo?.state == null) {
-        return ContainerState.Down;
+export function getContainerStatus(containerName, containerInfo) {
+    if (containerInfo?.status == null) {
+        return ContainerStatus.Down;
     }
-    return containerInfo?.state;
+    return containerInfo?.status;
 }
 
 export function isRunning(containerName, containerInfo) {
-    return getContainerState(containerName, containerInfo) === ContainerState.Running;
+    return getContainerStatus(containerName, containerInfo) === ContainerStatus.Running;
 }

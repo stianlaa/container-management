@@ -6,7 +6,7 @@ use std::collections::BTreeMap;
 use std::time::Duration;
 
 #[derive(Debug, Serialize)]
-pub enum State {
+pub enum Status {
     Created,
     Running,
     Restarting,
@@ -16,16 +16,16 @@ pub enum State {
     Unknown,
 }
 
-impl From<String> for State {
-    fn from(state: String) -> Self {
-        match state.as_str() {
-            "created" => State::Created,
-            "running" => State::Running,
-            "restarting" => State::Restarting,
-            "exited" => State::Exited,
-            "paused" => State::Paused,
-            "dead" => State::Dead,
-            _ => State::Unknown,
+impl From<String> for Status {
+    fn from(status: String) -> Self {
+        match status.as_str() {
+            "created" => Status::Created,
+            "running" => Status::Running,
+            "restarting" => Status::Restarting,
+            "exited" => Status::Exited,
+            "paused" => Status::Paused,
+            "dead" => Status::Dead,
+            _ => Status::Unknown,
         }
     }
 }
@@ -40,7 +40,7 @@ pub struct Container {
     pub id: String,
     pub image: String,
     pub command: String,
-    pub state: State,
+    pub status: Status,
     pub name: String,
 }
 
@@ -50,7 +50,7 @@ impl From<dockworker::container::Container> for Container {
             id: container.Id,
             image: container.Image,
             command: container.Command,
-            state: container.State.into(),
+            status: container.State.into(),
             name: container
                 .Names
                 .get(0)
@@ -82,7 +82,7 @@ pub struct ContainerInfo {
     pub process_label: String,
     pub resolvconf_path: String,
     pub restart_count: u64,
-    pub state: State,
+    pub status: Status,
 }
 
 impl From<dockworker::container::ContainerInfo> for ContainerInfo {
@@ -106,8 +106,7 @@ impl From<dockworker::container::ContainerInfo> for ContainerInfo {
             process_label: container.ProcessLabel,
             resolvconf_path: container.ResolvConfPath,
             restart_count: container.RestartCount,
-            // TODO rename struct and use to status, better name
-            state: container.State.Status.into(), // TODO map entire object? consider value of State? Rename current State to Status
+            status: container.State.Status.into(),
         }
     }
 }

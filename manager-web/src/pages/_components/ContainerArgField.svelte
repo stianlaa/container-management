@@ -6,7 +6,7 @@
         tryStopContainer
     } from "../../utils/api.ts";
     import {onMount} from "svelte";
-    import {getContainerState, ContainerState} from "../../utils/container.js"
+    import {getContainerStatus, ContainerStatus} from "../../utils/container.js"
     import {Circle} from "svelte-loading-spinners";
 
     export let containerName = null;
@@ -20,7 +20,7 @@
 
     async function initialUpdate() {
         defaultContainerOptions = await requestDefaultContainerOptions(containerName);
-        if (getContainerState(containerName, containerInfo) === ContainerState.Down) {
+        if (getContainerStatus(containerName, containerInfo) === ContainerStatus.Down) {
             commandLineArgsInput = defaultContainerOptions["entrypoint"].join(", ");
         } else {
             commandLineArgsInput = [`${containerName}`, ...containerInfo["args"]].join(", ");

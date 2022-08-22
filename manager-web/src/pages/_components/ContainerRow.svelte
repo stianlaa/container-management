@@ -6,7 +6,7 @@
         tryStopContainer,
         tryCreateContainer,
     } from "$utils/api";
-    import {ContainerState, getContainerState, isRunning} from "$utils/container";
+    import {ContainerStatus, getContainerStatus, isRunning} from "$utils/container";
     import {Circle} from "svelte-loading-spinners";
     import StatusTag from "./StatusTag.svelte";
 
@@ -18,7 +18,7 @@
 
     async function onStartContainerClick(containerName, containerInfo) {
         requestInProgress = true;
-        if (getContainerState(containerName, containerInfo) === ContainerState.Down) {
+        if (getContainerStatus(containerName, containerInfo) === ContainerStatus.Down) {
             let default_options = await requestDefaultContainerOptions(containerName);
             await tryCreateContainer(default_options);
         } else {
@@ -79,7 +79,7 @@
             <button class="entity-btn btn-large green darken-1" disabled={requestInProgress}
                     on:click={onStartContainerClick(containerName, containerInfo)}>
                 <i class="material-icons left">{"add_circle_outline"}</i>
-                {getContainerState(containerName, containerInfo) === ContainerState.Down ? "Create default" : "Start"}
+                {getContainerStatus(containerName, containerInfo) === ContainerStatus.Down ? "Create default" : "Start"}
             </button>
         {/if}
 
