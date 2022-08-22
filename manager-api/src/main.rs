@@ -49,8 +49,6 @@ fn start_container(data: Json<ContainerId>) -> WebResult<()> {
 
 #[rocket::put("/stop", format = "application/json", data = "<data>")]
 fn stop_container(data: Json<ContainerId>) -> WebResult<()> {
-    // TODO: fix, sometimes docker gives permission denied due to apparmor, atleast on ubuntu 20.04
-    // sudo aa-remove-unknown fixes it temporarily in a gentle way, but should be resolved
     container::stop(data.0)
 }
 

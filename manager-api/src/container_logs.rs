@@ -20,7 +20,6 @@ impl From<Vec<String>> for Log {
             messages: output
                 .into_iter()
                 .map(|entry| {
-                    // TODO fragile and perhaps inefficient, improve
                     let mut parts = entry.splitn(2, ' ').map(String::from);
                     let timestamp = parts.next().unwrap();
                     let message = parts.next().unwrap();
