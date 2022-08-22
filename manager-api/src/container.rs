@@ -54,9 +54,7 @@ impl From<dockworker::container::Container> for Container {
             name: container
                 .Names
                 .get(0)
-                // TODO find better way to handle
-                .get_or_insert(&String::from("missing_name"))
-                .clone()
+                .expect("containers should have at least one name")
                 .replace('/', ""),
         }
     }
