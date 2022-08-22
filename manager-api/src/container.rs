@@ -5,6 +5,9 @@ use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::time::Duration;
 
+const STOP_CONTAINER_TIMEOUT_MS: u64 = 1000;
+const RESTART_CONTAINER_TIMEOUT_MS: u64 = 1000;
+
 #[derive(Debug, Serialize)]
 pub enum Status {
     Created,
@@ -175,7 +178,10 @@ pub fn start(start_args: ContainerId) -> WebResult<()> {
 pub fn stop(stop_args: ContainerId) -> WebResult<()> {
     let docker = Docker::connect_with_defaults().unwrap();
     // TODO receive and deserialize duration from request
-    match docker.stop_container(stop_args.container_id.as_str(), Duration::from_secs(1)) {
+    match docker.stop_container(
+        stop_args.container_id.as_str(),
+        Duration::from_millis(STOP_CONTAINER_TIMEOUT_MS),
+    ) {
         Ok(_) => WebResult::Ok(()),
         Err(error) => WebResult::Err(WebError::new(
             500,
@@ -186,7 +192,10 @@ pub fn stop(stop_args: ContainerId) -> WebResult<()> {
 
 pub fn restart(start_args: ContainerId) -> WebResult<()> {
     let docker = Docker::connect_with_defaults().unwrap();
-    match docker.restart_container(&start_args.container_id, Duration::from_secs(1)) {
+    match docker.restart_container(
+        &start_args.container_id,
+        Duration::from_secs(RESTART_CONTAINER_TIMEOUT_MS),
+    ) {
         Ok(_) => WebResult::Ok(()),
         Err(error) => WebResult::Err(WebError::new(
             500,
