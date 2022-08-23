@@ -3,13 +3,13 @@ version: "3.9"
 services:
   manager-api:
      container_name: manager-api
-     image: stianlaa/dev-docker-repo:manager-api_${NU_VER}
+     image: stianlaa/dev-docker-repo:manager-api_${SYS_VER}
      build:
        context: .
        dockerfile: manager-api/Dockerfile
      entrypoint: [ "./run-service" ]
      environment:
-       - NU_VER=image_v0.0.5
+       - SYS_VER=image_v0.0.5
      ports:
        - "8000:8000"
      volumes:
@@ -17,7 +17,7 @@ services:
 
   manager-web:
      container_name: manager-web
-     image: stianlaa/dev-docker-repo:manager-web_${NU_VER}
+     image: stianlaa/dev-docker-repo:manager-web_${SYS_VER}
      build:
        context: .
        dockerfile: manager-web/Dockerfile
@@ -27,7 +27,7 @@ services:
 
   arg-poc:
     container_name: arg-poc
-    image: stianlaa/dev-docker-repo:arg-poc_${NU_VER}
+    image: stianlaa/dev-docker-repo:arg-poc_${SYS_VER}
     build:
       context: .
       dockerfile: arg-poc/Dockerfile
@@ -39,7 +39,7 @@ services:
 
   network-poc:
     container_name: network-poc
-    image: stianlaa/dev-docker-repo:network-poc_${NU_VER}
+    image: stianlaa/dev-docker-repo:network-poc_${SYS_VER}
     build:
       context: .
       dockerfile: network-poc/Dockerfile
@@ -52,7 +52,7 @@ services:
 
   volume-poc:
     container_name: volume-poc
-    image: stianlaa/dev-docker-repo:volume-poc_${NU_VER}
+    image: stianlaa/dev-docker-repo:volume-poc_${SYS_VER}
     build:
       context: .
       dockerfile: volume-poc/Dockerfile
@@ -60,7 +60,7 @@ services:
 
   panic-poc:
     container_name: panic-poc
-    image: stianlaa/dev-docker-repo:panic-poc_${NU_VER}
+    image: stianlaa/dev-docker-repo:panic-poc_${SYS_VER}
     build:
       context: .
       dockerfile: panic-poc/Dockerfile

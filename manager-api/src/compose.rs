@@ -10,12 +10,11 @@ pub fn read_compose() -> Result<Compose, Error> {
         std::env::var("COMPOSE_PATH").unwrap_or_else(|_| String::from("../compose.yml"));
     let file_payload = std::fs::read_to_string(compose_path.clone())
         .unwrap_or_else(|_| panic!("compose file expected at {compose_path}"));
-    let nu_ver = std::env::var("NU_VER").expect("NU_VER env var is required");
-    let file_payload = file_payload.replace("${NU_VER}", nu_ver.as_str());
+    let sys_ver = std::env::var("SYS_VER").expect("SYS_VER env var is required");
+    let file_payload = file_payload.replace("${SYS_VER}", sys_ver.as_str());
     serde_yaml::from_str::<Compose>(&file_payload)
 }
 
-// TODO instead of returning compose file directly, consider mapping to own structure
 pub fn get_docker_compose() -> WebResult<Compose> {
     match read_compose() {
         Ok(compose) => WebResult::Ok(compose),
