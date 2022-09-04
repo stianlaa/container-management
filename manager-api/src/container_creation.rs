@@ -12,8 +12,8 @@ pub struct CreateContainerResponse {
     pub warnings: Option<Vec<String>>,
 }
 
-/// request body of /containers/create api
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ContainerCreateOptions {
     pub container_name: String,
     pub hostname: String,
@@ -63,9 +63,6 @@ impl From<ContainerCreateOptions> for dockworker::ContainerCreateOptions {
             .stop_signal(options.stop_signal)
             .stop_timeout(options.stop_timeout)
             .clone();
-        options.env.into_iter().for_each(|s| {
-            creation_opt.env(s);
-        });
         options.cmd.into_iter().for_each(|s| {
             creation_opt.cmd(s);
         });

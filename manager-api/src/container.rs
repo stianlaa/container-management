@@ -39,6 +39,7 @@ pub struct ContainerId {
 }
 
 #[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ContainerConfig {
     pub attach_stderr: bool,
     pub attach_stdin: bool,
@@ -86,6 +87,7 @@ impl From<dockworker::container::Config> for ContainerConfig {
 }
 
 #[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ContainerInfo {
     pub app_armor_profile: String,
     pub args: Vec<String>,
