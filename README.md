@@ -1,10 +1,20 @@
-# container-management
-An experimental repo to test out management approaches of docker containers 
+# Container manager
+An experimental repo to explore container management of docker containers as an alternative or supplement to systemd services.
 
-## Installation:
-See: https://docs.docker.com/engine/install/ubuntu/
+In short this repo seeks to take full advantage of the statelessness of containerized systems. By wrapping applications in containers incrementing versions should be trivial, regardless of which versions a system has run before. It should also give added bonuses in terms of logging and transparency in terms of which containers have access to which devices. Finally it offers modification of application arguments and clean restarts in a handy manner and also hides away the docker daemon from malicious users.
 
-## Basic use:
+![Usage example of container manager](/container_management.gif?raw=true "Starting container manager, creating and starting a container, and editing its arguments")
+
+## Getting started:
+1. Ensure you have installed docker, see: https://docs.docker.com/engine/install/ubuntu/
+2. Build the proof-of-concept images, and manager backend and frontend applications using `SYS_VER=image_v0.0.5 docker compose build`
+3. Start up the `manager-api` and `manager-web` applications in the background using ? `docker compose up manager-api manager-web -d`
+4. Navigate to localhost:5000
+
+
+## Work notes:
+
+### Basic use:
 
 Build images: `docker compose build arg-poc`
 Run specific image: `docker compose up arg-poc`
@@ -76,7 +86,11 @@ It seems that docker daemon communications ideally over socket, and a webserver 
 It is possible to expose the docker daemon, but not recommended, and this would entail extra work in frontend: https://towardsaws.com/ec2-2-ways-to-expose-docker-daemon-to-the-internet-why-61e349f99744
 
 ### Remaining to explore:
+- replace compose and sub objects with own object
 - make api casing consistent
+- consider how SYS_VER might best be set
+- make tests, look into integration tests, mocking away dockerworker
+  - read example compose file, serialize it, (with camelCase)
 - fix refreshing on containerpage
 - consider protecting some containers from being stopped from frontend
 - make example app which uses camera
